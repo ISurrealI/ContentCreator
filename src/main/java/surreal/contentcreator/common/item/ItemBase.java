@@ -164,6 +164,7 @@ public class ItemBase extends Item {
             return this;
         }
 
+        @ZenMethod
         public ValueItem setModelLocation(String modelLocation) {
             this.modelLocation = modelLocation;
             return this;
@@ -267,8 +268,9 @@ public class ItemBase extends Item {
         }
 
         @ZenMethod
-        public void setColor(int color) {
+        public ValueItem setColor(int color) {
             this.color = color;
+            return this;
         }
 
         private static EnumRarity getRarity(String name) {
