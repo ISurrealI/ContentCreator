@@ -158,6 +158,10 @@ public class ItemBase extends Item {
         public boolean beaconPayment = false;
         public int color = 0xFFFFFF;
 
+        public ValueItem() {
+            this.toolClasses = new HashMap<>();
+        }
+
         @ZenMethod("setUnlocalizedName")
         public ValueItem setUnlocName(String unlocName) {
             this.unlocName = unlocName;
@@ -190,7 +194,6 @@ public class ItemBase extends Item {
 
         @ZenMethod
         public ValueItem setTool(String tool, int level) {
-            if (toolClasses == null) this.toolClasses = new HashMap<>();
             toolClasses.putIfAbsent(tool, level);
             return this;
         }
