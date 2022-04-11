@@ -1,12 +1,16 @@
 package surreal.contentcreator.proxy;
 
 import net.minecraft.item.Item;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import surreal.contentcreator.CTUtils;
 import surreal.contentcreator.ModValues;
+import surreal.contentcreator.brackets.ItemBracketHandler;
 import surreal.contentcreator.common.item.ItemBase;
 
 import java.util.ArrayList;
@@ -25,5 +29,10 @@ public class CommonProxy {
     @SubscribeEvent
     public static void registerItems(RegistryEvent.Register<Item> event) {
         event.getRegistry().registerAll(ITEMS.toArray(new Item[ITEMS.size()]));
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void registerRecipesLowest(RegistryEvent.Register<IRecipe> event) {
+        if (ItemBracketHandler.itemMap == null) ItemBracketHandler.itemMap = CTUtils.getMap();
     }
 }

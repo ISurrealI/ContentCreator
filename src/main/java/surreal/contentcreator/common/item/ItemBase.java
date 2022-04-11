@@ -26,16 +26,19 @@ import java.util.*;
 @ZenRegister
 @ZenClass("mods.contentcreator.item.Item")
 public class ItemBase extends Item {
+    public static final List<ItemBase> ITEMS = new ArrayList<>();
+
     public final List<ValueItem> METAITEMS;
     public Map<Integer, Integer> COLOR = null;
 
     public ItemBase() {
+        ITEMS.add(this);
         METAITEMS = new ArrayList<>();
     }
 
     @ZenMethod
     public static ItemBase createItem(String name) {
-        return (ItemBase) new ItemBase().setRegistryName(ModValues.MODID, name).setCreativeTab(CreativeTabs.SEARCH);
+        return (ItemBase) new ItemBase().setRegistryName(ModValues.MODID, name).setCreativeTab(CreativeTabs.SEARCH).setUnlocalizedName(ModValues.MODID + ".");
     }
 
     @ZenMethod
