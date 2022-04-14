@@ -10,7 +10,7 @@ import surreal.contentcreator.proxy.CommonProxy;
 
 import static surreal.contentcreator.ModValues.*;
 
-@Mod(modid = MODID, name = NAME, version = VERSION, dependencies = "required-after:crafttweaker")
+@Mod(modid = MODID, name = NAME, version = VERSION, dependencies = "required-after:crafttweaker;after:applecore")
 public class ContentCreator {
     private static final Logger LOGGER = LogManager.getLogger(MODID);
 

@@ -29,11 +29,18 @@ repositories {
         name "Jared Maven"
         url "http://maven.blamejared.com/" // for Crafttweaker and BWM
     }
+    maven {
+        name "Applecore"
+        url "http://www.ryanliptak.com/maven/" // for Applecore
+    }
 }
 
 dependencies {
     // Crafttweaker
     deobfCompile "CraftTweaker2:CraftTweaker2-MC1120-Main:1.12-4.1.20.673"
+
+    // Applecore
+    deobfCompile "applecore:AppleCore:1.12.2-3.1.5:deobf"
 }
 
 processResources {
