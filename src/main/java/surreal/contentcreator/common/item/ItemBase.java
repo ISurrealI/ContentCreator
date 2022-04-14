@@ -28,9 +28,10 @@ import squeek.applecore.api.food.FoodValues;
 import squeek.applecore.api.food.IEdible;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
-import surreal.contentcreator.CTUtils;
+import surreal.contentcreator.util.CTUtil;
 import surreal.contentcreator.ModValues;
 import surreal.contentcreator.proxy.CommonProxy;
+import surreal.contentcreator.util.TintColor;
 
 import java.util.*;
 
@@ -42,8 +43,7 @@ public class ItemBase extends Item implements IEdible {
     public static final List<ItemBase> ITEMS = new ArrayList<>();
 
     public final List<ValueItem> METAITEMS;
-    public Map<Integer, Integer> COLOR = null;
-
+    public Map<Integer, List<TintColor>> COLOR = null;
 
     public ItemBase() {
         ITEMS.add(this);
@@ -72,9 +72,9 @@ public class ItemBase extends Item implements IEdible {
         for (int i = 0; i < METAITEMS.size(); i++) {
             ValueItem value = METAITEMS.get(i);
 
-            if (value.color != 0xFFFFFF) {
+            if (value.tintColor != null) {
                 if (COLOR == null) COLOR = new HashMap<>();
-                COLOR.putIfAbsent(i, value.color);
+                COLOR.putIfAbsent(i, value.tintColor);
             }
         }
 
@@ -224,7 +224,10 @@ public class ItemBase extends Item implements IEdible {
     @ZenClass("mods.contentcreator.item.ValueItem")
     public static class ValueItem {
         public String unlocName = null;
+
+        // model
         public String modelLocation = null;
+        public String[] textures = null;
 
         public int maxDamage = 0;
         public int entityHitDamage = 0;
@@ -237,7 +240,6 @@ public class ItemBase extends Item implements IEdible {
         public boolean repairable = !repairStack.isEmpty() && maxDamage > 0;
         public float xpRepairRatio = 2F;
 
-
         public int stackSize = 64;
         public float destroySpeed = 1F; // 0 to disable block breaking
         public Map<String, Integer> toolClasses = null;
@@ -246,7 +248,7 @@ public class ItemBase extends Item implements IEdible {
         public int enchantability = 0;
         public Enchantment[] enchantments = null;
         public boolean beaconPayment = false;
-        public int color = 0xFFFFFF;
+        public List<TintColor> tintColor = null;
         public EnumAction action = EnumAction.NONE;
 
         // food
@@ -305,7 +307,7 @@ public class ItemBase extends Item implements IEdible {
 
         @ZenMethod
         public ValueItem setAllowedEnchantments(IEnchantmentDefinition... enchantment) {
-            this.enchantments = CTUtils.getEnchantments(enchantment);
+            this.enchantments = CTUtil.getEnchantments(enchantment);
             return this;
         }
 
@@ -370,8 +372,9 @@ public class ItemBase extends Item implements IEdible {
         }
 
         @ZenMethod
-        public ValueItem setColor(int color) {
-            this.color = color;
+        public ValueItem setTintColor(int tint, int color) {
+            if (this.tintColor == null) this.tintColor = new ArrayList<>();
+            this.tintColor.add(new TintColor(tint, color));
             return this;
         }
 
@@ -405,6 +408,18 @@ public class ItemBase extends Item implements IEdible {
         @ZenMethod
         public ValueItem setAction(String name) {
             this.action = getAction(name);
+            return this;
+        }
+
+        @ZenMethod
+        public ValueItem setTextures(String... textures) {
+            textures = new String[textures.length];
+
+            for (int i = 0; i < textures.length; i++) {
+                if (textures[i] != null) textures[i] = textures[i];
+                else textures[i] = "null";
+            }
+
             return this;
         }
 

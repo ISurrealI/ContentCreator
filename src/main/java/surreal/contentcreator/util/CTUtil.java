@@ -1,4 +1,4 @@
-package surreal.contentcreator;
+package surreal.contentcreator.util;
 
 import crafttweaker.api.enchantments.IEnchantmentDefinition;
 import net.minecraft.creativetab.CreativeTabs;
@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CTUtils {
+public class CTUtil {
     public static Enchantment[] getEnchantments(IEnchantmentDefinition[] enchantments) {
         Enchantment[] enchs = new Enchantment[enchantments.length];
 
