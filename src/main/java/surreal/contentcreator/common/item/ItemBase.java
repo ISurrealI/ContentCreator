@@ -52,7 +52,7 @@ public class ItemBase extends Item implements IEdible {
 
     @ZenMethod
     public static ItemBase createItem(String name) {
-        return (ItemBase) new ItemBase().setRegistryName(ModValues.MODID, name).setCreativeTab(CreativeTabs.SEARCH).setUnlocalizedName(ModValues.MODID + ".");
+        return (ItemBase) new ItemBase().setRegistryName(ModValues.MODID, name).setCreativeTab(CreativeTabs.SEARCH);
     }
 
     @ZenMethod
@@ -69,13 +69,18 @@ public class ItemBase extends Item implements IEdible {
     @ZenMethod
     public void register() {
         this.setHasSubtypes(METAITEMS.size() > 1);
-        for (int i = 0; i < METAITEMS.size(); i++) {
-            ValueItem value = METAITEMS.get(i);
 
-            if (value.tintColor != null) {
-                if (COLOR == null) COLOR = new HashMap<>();
-                COLOR.putIfAbsent(i, value.tintColor);
+        if (METAITEMS.size() > 0) {
+            for (int i = 0; i < METAITEMS.size(); i++) {
+                ValueItem value = METAITEMS.get(i);
+
+                if (value.tintColor != null) {
+                    if (COLOR == null) COLOR = new HashMap<>();
+                    COLOR.putIfAbsent(i, value.tintColor);
+                }
             }
+        } else {
+            addItem(create());
         }
 
         CommonProxy.ITEMS.add((ItemBase) this.setUnlocalizedName(ModValues.MODID + "." + this.getRegistryName().getResourcePath()));
@@ -144,7 +149,7 @@ public class ItemBase extends Item implements IEdible {
     public ModelResourceLocation getModel(int meta) {
         ValueItem value = METAITEMS.get(meta);
 
-        return new ModelResourceLocation(new ResourceLocation((value.modelLocation == null ? this.getRegistryName() + (METAITEMS.size() > 1 ? "_" + meta : "") : value.modelLocation)), "inventory");
+        return new ModelResourceLocation(new ResourceLocation((value.modelLocation == null ? this.getRegistryName().toString().replace(".", "_") + (METAITEMS.size() > 1 ? "_" + meta : "") : ModValues.MODID + ":" + value.modelLocation)), "inventory");
     }
 
     @Optional.Method(modid = "applecore")
@@ -227,7 +232,6 @@ public class ItemBase extends Item implements IEdible {
 
         // model
         public String modelLocation = null;
-        public String[] textures = null;
 
         public int maxDamage = 0;
         public int entityHitDamage = 0;
@@ -258,6 +262,9 @@ public class ItemBase extends Item implements IEdible {
         public boolean alwaysEdible = false;
 
         public int useDuration = 0;
+
+        // ores
+        public String[] ores = null;
 
         public ValueItem() {
             this.toolClasses = new HashMap<>();
@@ -412,14 +419,8 @@ public class ItemBase extends Item implements IEdible {
         }
 
         @ZenMethod
-        public ValueItem setTextures(String... textures) {
-            textures = new String[textures.length];
-
-            for (int i = 0; i < textures.length; i++) {
-                if (textures[i] != null) textures[i] = textures[i];
-                else textures[i] = "null";
-            }
-
+        public ValueItem setOres(String... ores) {
+            this.ores = ores;
             return this;
         }
 

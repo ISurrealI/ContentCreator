@@ -36,12 +36,16 @@ public class CTUtil {
         for (ItemBase item : ItemBase.ITEMS) {
             String itemName = item.getRegistryName().getResourcePath();
 
-            for (int meta = 0; meta < Math.min(item.METAITEMS.size(), Short.MAX_VALUE-1); meta++) {
-                String name = item.METAITEMS.get(meta).unlocName;
+            if (item.METAITEMS.size() > 1) {
+                for (int meta = 0; meta < Math.min(item.METAITEMS.size(), Short.MAX_VALUE-1); meta++) {
+                    String name = item.METAITEMS.get(meta).unlocName;
 
-                if (name == null) name = "" + meta;
+                    if (name == null) name = "" + meta;
 
-                map.put(itemName + ":" + name, new ItemStack(item, 1, meta));
+                    map.put(itemName + ":" + name, new ItemStack(item, 1, meta));
+                }
+            } else {
+                map.put(itemName, new ItemStack(item));
             }
         }
 
