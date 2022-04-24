@@ -2,14 +2,18 @@ package surreal.contentcreator.util;
 
 import com.google.gson.JsonObject;
 import net.minecraft.client.Minecraft;
+import net.minecraft.item.Item;
+import net.minecraftforge.fluids.Fluid;
 import org.apache.commons.lang3.text.WordUtils;
 import surreal.contentcreator.ModValues;
+import surreal.contentcreator.common.fluid.FluidBase;
 import surreal.contentcreator.common.item.ItemBase;
 import surreal.contentcreator.common.item.ItemMaterial;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.List;
 
 public class GeneralUtil {
     public static String toUppercase(String name) {
@@ -34,38 +38,46 @@ public class GeneralUtil {
         }
     }
 
-    public static void generateModelFileItem(ItemMaterial item) {
-        JsonObject object = new JsonObject();
-        object.addProperty("parent", "item/generated");
+    public static void generateModelFileItem(Item it) {
+        if (it instanceof ItemBase) {
+            ItemBase item = (ItemBase) it;
 
-        JsonObject texObject = new JsonObject();
-        texObject.addProperty("layer0", ModValues.MODID + ":items/" + item.getRegistryName().getResourcePath());
+            for (int i = 0; i < item.METAITEMS.size(); i++) {
+                JsonObject object = new JsonObject();
 
-        object.add("textures", texObject);
+                object.addProperty("parent", "item/generated");
 
-        try {
-            File f = new File(Minecraft.getMinecraft().mcDataDir, "resources/" + ModValues.MODID + "/models/item");
-            boolean check = f.exists() || f.mkdirs();
+                JsonObject texObject = new JsonObject();
+                texObject.addProperty("layer0", ModValues.MODID + ":items/" + item.getModel(i).getResourcePath());
 
-            if (check) {
-                f = new File(f, item.getRegistryName().getResourcePath() + ".json");
-                FileWriter file = new FileWriter(f);
-                file.write(object.toString());
-                file.close();
+                object.add("textures", texObject);
+
+                try {
+                    File f = new File(Minecraft.getMinecraft().mcDataDir, "resources/" + ModValues.MODID + "/models/item");
+                    boolean check = f.exists() || f.mkdirs();
+
+                    if (check) {
+                        f = new File(f, item.getModel(i).getResourcePath() + ".json");
+
+                        if (!f.exists()) {
+                            FileWriter file = new FileWriter(f);
+                            file.write(object.toString());
+                            file.close();
+                        }
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+        } else if (it instanceof ItemMaterial) {
+            ItemMaterial item = (ItemMaterial) it;
 
-    public static void generateModelFileItem(ItemBase item) {
-        for (int i = 0; i < item.METAITEMS.size(); i++) {
             JsonObject object = new JsonObject();
-
             object.addProperty("parent", "item/generated");
 
             JsonObject texObject = new JsonObject();
-            texObject.addProperty("layer0", ModValues.MODID + ":items/" + item.getModel(i).getResourcePath());
+            texObject.addProperty("layer0", ModValues.MODID + ":items/" + item.getRegistryName().getResourcePath());
 
             object.add("textures", texObject);
 
@@ -74,12 +86,53 @@ public class GeneralUtil {
                 boolean check = f.exists() || f.mkdirs();
 
                 if (check) {
-                    f = new File(f, item.getModel(i).getResourcePath() + ".json");
+                    f = new File(f, item.getRegistryName().getResourcePath() + ".json");
+                    
+                    if (!f.exists()) {
+                        FileWriter file = new FileWriter(f);
+                        file.write(object.toString());
+                        file.close();
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void generateFluidFiles(List<FluidBase> list) {
+        if (list.size() > 0) {
+            JsonObject object = new JsonObject();
+            object.addProperty("forge_marker", 1);
+            JsonObject variants = new JsonObject();
+
+            for (Fluid fluid : list) {
+                if (variants.get(fluid.getName()) != null) continue;
+
+                JsonObject fluidObj = new JsonObject();
+                JsonObject customFluid = new JsonObject();
+
+                customFluid.addProperty("fluid", fluid.getName());
+
+                fluidObj.addProperty("model", "forge:fluid");
+                fluidObj.add("custom", customFluid);
+
+                variants.add(fluid.getName(), fluidObj);
+            }
+
+            object.add("variants", variants);
+
+            try {
+                File f = new File(Minecraft.getMinecraft().mcDataDir, "resources/" + ModValues.MODID + "/blockstates");
+                boolean check = f.exists() || f.mkdirs();
+
+                if (check) {
+                    f = new File(f, "fluids.json");
+
                     FileWriter file = new FileWriter(f);
                     file.write(object.toString());
                     file.close();
                 }
-
             } catch (IOException e) {
                 e.printStackTrace();
             }

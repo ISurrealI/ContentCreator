@@ -4,12 +4,14 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.oredict.OreDictionary;
+import surreal.contentcreator.common.fluid.FluidBase;
 import surreal.contentcreator.common.item.ItemMaterial;
 import surreal.contentcreator.common.material.MaterialPart;
 import surreal.contentcreator.util.CTUtil;
@@ -26,12 +28,25 @@ public class CommonProxy {
     public static List<ItemBase> ITEMS = new ArrayList<>();
     public static List<ItemMaterial> MATERIAL_ITEMS = new ArrayList<>();
 
+    public static List<FluidBase> FLUIDS = new ArrayList<>();
+
     public void preInit(FMLPreInitializationEvent event) {
         MaterialPart.init();
+
         GeneralUtil.generateFiles();
+        GeneralUtil.generateFluidFiles(FLUIDS);
+
+        registerFluids();
     }
 
     public void init(FMLInitializationEvent event) {
+    }
+
+    private static void registerFluids() {
+        for (FluidBase fluid : FLUIDS) {
+            FluidRegistry.registerFluid(fluid);
+            if (fluid.bucket) FluidRegistry.addBucketForFluid(fluid);
+        }
     }
 
     @SubscribeEvent

@@ -4,8 +4,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelBakery;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.color.IItemColor;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -17,11 +20,13 @@ import surreal.contentcreator.util.CTUtil;
 import surreal.contentcreator.util.GeneralUtil;
 import surreal.contentcreator.util.TintColor;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 @Mod.EventBusSubscriber(modid = ModValues.MODID)
 public class ClientProxy extends CommonProxy {
+    public static final List<ResourceLocation> fluidTextures = new ArrayList<>();
     private static final List<TintColor> DEFAULTITEMCOLOR = Collections.singletonList(new TintColor(0, 0xFFFFFF));
 
     public static final IItemColor ITEMCOLOR = (ItemStack stack, int index) -> {
@@ -47,6 +52,28 @@ public class ClientProxy extends CommonProxy {
         return 0xFFFFFF;
     };
 
+    @Override
+    public void init(FMLInitializationEvent event) {
+        for (ItemBase item : CommonProxy.ITEMS) {
+            Minecraft.getMinecraft().getItemColors().registerItemColorHandler(ITEMCOLOR, item);
+        }
+
+        for (ItemMaterial item : CommonProxy.MATERIAL_ITEMS) {
+            Minecraft.getMinecraft().getItemColors().registerItemColorHandler(MATERIALITEMCOLOR, item);
+        }
+    }
+
+    private static void registerSprites(TextureMap map) {
+        for (ResourceLocation location : fluidTextures) {
+            map.registerSprite(location);
+        }
+    }
+
+    @SubscribeEvent
+    public static void registerTextures(TextureStitchEvent.Pre event) {
+        registerSprites(event.getMap());
+    }
+
     @SubscribeEvent
     public static void registerModels(ModelRegistryEvent event) {
         for (ItemBase item : CommonProxy.ITEMS) {
@@ -61,17 +88,6 @@ public class ClientProxy extends CommonProxy {
             ModelBakery.registerItemVariants(item, item.getRegistryName());
             ModelLoader.setCustomMeshDefinition(item, (stack -> new ModelResourceLocation(item.getRegistryName(), "inventory")));
             GeneralUtil.generateModelFileItem(item);
-        }
-    }
-
-    @Override
-    public void init(FMLInitializationEvent event) {
-        for (ItemBase item : CommonProxy.ITEMS) {
-            Minecraft.getMinecraft().getItemColors().registerItemColorHandler(ITEMCOLOR, item);
-        }
-
-        for (ItemMaterial item : CommonProxy.MATERIAL_ITEMS) {
-            Minecraft.getMinecraft().getItemColors().registerItemColorHandler(MATERIALITEMCOLOR, item);
         }
     }
 }

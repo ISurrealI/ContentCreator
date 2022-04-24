@@ -290,7 +290,7 @@ public class ItemBase extends Item implements IEdible {
 
         @ZenMethod
         public ValueItem setRarity(String rarity) {
-            this.rarity = getRarity(rarity);
+            this.rarity = CTUtil.getRarity(rarity);
             return this;
         }
 
@@ -422,14 +422,6 @@ public class ItemBase extends Item implements IEdible {
         public ValueItem setOres(String... ores) {
             this.ores = ores;
             return this;
-        }
-
-        private static EnumRarity getRarity(String name) {
-            for (EnumRarity rarity : EnumRarity.values()) {
-                if (rarity.name().equalsIgnoreCase(name)) return rarity;
-            }
-
-            return EnumRarity.COMMON;
         }
 
         private static EnumAction getAction(String name) {

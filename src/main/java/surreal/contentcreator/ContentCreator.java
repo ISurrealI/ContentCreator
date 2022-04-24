@@ -1,5 +1,6 @@
 package surreal.contentcreator;
 
+import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -13,6 +14,10 @@ import static surreal.contentcreator.ModValues.*;
 @Mod(modid = MODID, name = NAME, version = VERSION, dependencies = "required-after:crafttweaker;after:applecore")
 public class ContentCreator {
     private static final Logger LOGGER = LogManager.getLogger(MODID);
+
+    static {
+        if (!FluidRegistry.isUniversalBucketEnabled()) FluidRegistry.enableUniversalBucket();
+    }
 
     @SidedProxy(serverSide = COMMON, clientSide = CLIENT)
     private static CommonProxy PROXY;

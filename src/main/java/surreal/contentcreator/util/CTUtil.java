@@ -3,9 +3,11 @@ package surreal.contentcreator.util;
 import crafttweaker.api.enchantments.IEnchantmentDefinition;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.SoundEvent;
 import surreal.contentcreator.common.item.ItemBase;
 
 import java.util.HashMap;
@@ -50,5 +52,21 @@ public class CTUtil {
         }
 
         return map;
+    }
+
+    public static EnumRarity getRarity(String name) {
+        for (EnumRarity rarity : EnumRarity.values()) {
+            if (rarity.name().equalsIgnoreCase(name)) return rarity;
+        }
+
+        return EnumRarity.COMMON;
+    }
+
+    public static SoundEvent getSound(String name) {
+        for (SoundEvent event : SoundEvent.REGISTRY) {
+            if (event.getSoundName().toString().equalsIgnoreCase(name)) return event;
+        }
+
+        return null;
     }
 }
