@@ -10,10 +10,12 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import surreal.contentcreator.ModValues;
+import surreal.contentcreator.client.fluid.CustomFluidStateMapper;
 import surreal.contentcreator.common.item.ItemBase;
 import surreal.contentcreator.common.item.ItemMaterial;
 import surreal.contentcreator.util.CTUtil;
@@ -69,6 +71,17 @@ public class ClientProxy extends CommonProxy {
         }
     }
 
+    private static void registerMappers() {
+        for (Fluid fluid : CommonProxy.FLUIDS) {
+            registerFluidMapper(fluid);
+        }
+    }
+
+    private static void registerFluidMapper(Fluid fluid) {
+        CustomFluidStateMapper mapper = new CustomFluidStateMapper(fluid.getName());
+        ModelLoader.setCustomStateMapper(fluid.getBlock(), mapper);
+    }
+
     @SubscribeEvent
     public static void registerTextures(TextureStitchEvent.Pre event) {
         registerSprites(event.getMap());
@@ -76,6 +89,8 @@ public class ClientProxy extends CommonProxy {
 
     @SubscribeEvent
     public static void registerModels(ModelRegistryEvent event) {
+        registerMappers();
+
         for (ItemBase item : CommonProxy.ITEMS) {
             for (int i = 0; i < CTUtil.getStacks(item).size(); i++) {
                 ModelLoader.setCustomModelResourceLocation(item, i, item.getModel(i));

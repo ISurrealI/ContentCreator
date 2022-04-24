@@ -1,7 +1,9 @@
 package surreal.contentcreator.common.fluid;
 
 import crafttweaker.annotations.ZenRegister;
-import net.minecraft.block.Block;
+import crafttweaker.api.block.IMaterial;
+import crafttweaker.api.minecraft.CraftTweakerMC;
+import net.minecraft.block.material.Material;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraftforge.fluids.Fluid;
@@ -12,10 +14,8 @@ import surreal.contentcreator.ModValues;
 import surreal.contentcreator.proxy.ClientProxy;
 import surreal.contentcreator.proxy.CommonProxy;
 import surreal.contentcreator.util.CTUtil;
-import surreal.contentcreator.util.GeneralUtil;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("unused")
@@ -26,6 +26,7 @@ public class FluidBase extends Fluid {
     private static final List<ResourceLocation> TEXTURES = ClientProxy.fluidTextures;
 
     public boolean bucket = false;
+    public Material blockMaterial = null;
 
     public FluidBase(String fluidName, ResourceLocation still, ResourceLocation flowing, @Nullable ResourceLocation overlay) {
         super(fluidName, still, flowing, overlay);
@@ -44,6 +45,12 @@ public class FluidBase extends Fluid {
         if (!TEXTURES.contains(flow)) TEXTURES.add(flow);
 
         return new FluidBase(name, still, flow, ol);
+    }
+
+    @ZenMethod
+    public FluidBase addBlock(IMaterial material) {
+        this.blockMaterial = CraftTweakerMC.getMaterial(material);
+        return this;
     }
 
     @ZenMethod("setUnlocalizedName")
@@ -106,10 +113,5 @@ public class FluidBase extends Fluid {
     @ZenMethod("setColor")
     public FluidBase setCol(int color) {
         return (FluidBase) super.setColor(color);
-    }
-
-    @Override
-    public Fluid setBlock(Block block) {
-        return super.setBlock(block);
     }
 }

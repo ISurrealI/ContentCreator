@@ -1,5 +1,6 @@
 package surreal.contentcreator.proxy;
 
+import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
@@ -12,6 +13,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.oredict.OreDictionary;
 import surreal.contentcreator.common.fluid.FluidBase;
+import surreal.contentcreator.common.fluid.FluidBlockBase;
 import surreal.contentcreator.common.item.ItemMaterial;
 import surreal.contentcreator.common.material.MaterialPart;
 import surreal.contentcreator.util.CTUtil;
@@ -27,6 +29,8 @@ import java.util.List;
 public class CommonProxy {
     public static List<ItemBase> ITEMS = new ArrayList<>();
     public static List<ItemMaterial> MATERIAL_ITEMS = new ArrayList<>();
+
+    public static List<Block> BLOCKS = new ArrayList<>();
 
     public static List<FluidBase> FLUIDS = new ArrayList<>();
 
@@ -46,6 +50,12 @@ public class CommonProxy {
         for (FluidBase fluid : FLUIDS) {
             FluidRegistry.registerFluid(fluid);
             if (fluid.bucket) FluidRegistry.addBucketForFluid(fluid);
+            if (fluid.blockMaterial != null) {
+                FluidBlockBase fluidBlock = new FluidBlockBase(fluid, fluid.blockMaterial);
+
+                BLOCKS.add(fluidBlock);
+                fluid.setBlock(fluidBlock);
+            }
         }
     }
 
@@ -59,6 +69,11 @@ public class CommonProxy {
             ItemMaterial item = new ItemMaterial(type);
             event.getRegistry().register(item);
         }
+    }
+
+    @SubscribeEvent
+    public static void registerBlocks(RegistryEvent.Register<Block> event) {
+        event.getRegistry().registerAll(BLOCKS.toArray(new Block[BLOCKS.size()]));
     }
     
     @SubscribeEvent
