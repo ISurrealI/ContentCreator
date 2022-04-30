@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @ZenRegister
-@ZenClass("mods.contentcreator.MaterialPart")
+@ZenClass("contentcreator.material.Part")
 public class MaterialPart {
     public static List<MaterialPart> TYPES = new ArrayList<>();
     public static MaterialPart ingot, gem, plate, gear;

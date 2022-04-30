@@ -5,7 +5,6 @@ import crafttweaker.api.block.IMaterial;
 import crafttweaker.api.minecraft.CraftTweakerMC;
 import net.minecraft.block.material.Material;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvent;
 import net.minecraftforge.fluids.Fluid;
 import stanhebben.zenscript.annotations.Optional;
 import stanhebben.zenscript.annotations.ZenClass;
@@ -13,6 +12,7 @@ import stanhebben.zenscript.annotations.ZenMethod;
 import surreal.contentcreator.ModValues;
 import surreal.contentcreator.proxy.ClientProxy;
 import surreal.contentcreator.proxy.CommonProxy;
+import surreal.contentcreator.types.CTSoundEvent;
 import surreal.contentcreator.util.CTUtil;
 
 import javax.annotation.Nullable;
@@ -21,7 +21,7 @@ import java.util.List;
 @SuppressWarnings("unused")
 
 @ZenRegister
-@ZenClass("mods.contentcreator.Fluid")
+@ZenClass("contentcreator.fluid.Fluid")
 public class FluidBase extends Fluid {
     private static final List<ResourceLocation> TEXTURES = ClientProxy.fluidTextures;
 
@@ -95,19 +95,13 @@ public class FluidBase extends Fluid {
     }
 
     @ZenMethod("setFillSound")
-    public FluidBase setFill(String soundevent) {
-        SoundEvent event = CTUtil.getSound(soundevent);
-
-        if (event != null) return (FluidBase) super.setFillSound(event);
-        return this;
+    public FluidBase setFill(CTSoundEvent soundevent) {
+        return (FluidBase) super.setFillSound(soundevent.getInternal());
     }
 
     @ZenMethod("setEmptySound")
-    public FluidBase setEmpty(String soundevent) {
-        SoundEvent event = CTUtil.getSound(soundevent);
-
-        if (event != null) return (FluidBase) super.setEmptySound(event);
-        return this;
+    public FluidBase setEmpty(CTSoundEvent soundevent) {
+        return (FluidBase) super.setEmptySound(soundevent.getInternal());
     }
 
     @ZenMethod("setColor")

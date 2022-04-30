@@ -37,7 +37,7 @@ import java.util.*;
 
 // Implement damage with nbt
 @ZenRegister
-@ZenClass("mods.contentcreator.item.Item")
+@ZenClass("contentcreator.item.Item")
 @Optional.Interface(iface = "squeek.applecore.api.food.IEdible", modid = "applecore")
 public class ItemBase extends Item implements IEdible {
     public static final List<ItemBase> ITEMS = new ArrayList<>();

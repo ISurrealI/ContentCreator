@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @ZenRegister
-@ZenClass("mods.contentcreator.Material")
+@ZenClass("contentcreator.material.Material")
 public class Material {
     public static List<Material> MATERIALS = new ArrayList<>();
 
