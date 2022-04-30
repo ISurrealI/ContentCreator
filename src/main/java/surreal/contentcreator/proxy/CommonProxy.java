@@ -2,8 +2,10 @@ package surreal.contentcreator.proxy;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.util.SoundEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fml.common.Mod;
@@ -12,6 +14,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.oredict.OreDictionary;
+import surreal.contentcreator.common.block.BlockBase;
 import surreal.contentcreator.common.fluid.FluidBase;
 import surreal.contentcreator.common.fluid.FluidBlockBase;
 import surreal.contentcreator.common.item.ItemMaterial;
@@ -29,10 +32,15 @@ import java.util.List;
 public class CommonProxy {
     public static List<ItemBase> ITEMS = new ArrayList<>();
     public static List<ItemMaterial> MATERIAL_ITEMS = new ArrayList<>();
+    public static List<ItemBlock> ITEMBLOCKS = new ArrayList<>();
 
     public static List<Block> BLOCKS = new ArrayList<>();
-
     public static List<FluidBase> FLUIDS = new ArrayList<>();
+
+    public static List<SoundEvent> SOUNDS = new ArrayList<>();
+
+    private static void init() {
+    }
 
     public void preInit(FMLPreInitializationEvent event) {
         MaterialPart.init();
@@ -41,6 +49,8 @@ public class CommonProxy {
         GeneralUtil.generateFluidFiles(FLUIDS);
 
         registerFluids();
+
+        init();
     }
 
     public void init(FMLInitializationEvent event) {
@@ -60,8 +70,14 @@ public class CommonProxy {
     }
 
     @SubscribeEvent
+    public static void registerSounds(RegistryEvent.Register<SoundEvent> event) {
+        event.getRegistry().registerAll(SOUNDS.toArray(new SoundEvent[SOUNDS.size()]));
+    }
+
+    @SubscribeEvent
     public static void registerItems(RegistryEvent.Register<Item> event) {
         event.getRegistry().registerAll(ITEMS.toArray(new Item[ITEMS.size()]));
+        event.getRegistry().registerAll(ITEMBLOCKS.toArray(new ItemBlock[ITEMBLOCKS.size()]));
 
         for (MaterialPart type : MaterialPart.TYPES) {
             if (type.getMaterials() == null) continue;

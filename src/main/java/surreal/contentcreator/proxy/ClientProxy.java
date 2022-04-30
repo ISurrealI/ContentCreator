@@ -5,6 +5,7 @@ import net.minecraft.client.renderer.block.model.ModelBakery;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelRegistryEvent;
@@ -96,6 +97,13 @@ public class ClientProxy extends CommonProxy {
                 ModelLoader.setCustomModelResourceLocation(item, i, item.getModel(i));
             }
 
+            GeneralUtil.generateModelFileItem(item);
+        }
+
+        for (ItemBlock item : CommonProxy.ITEMBLOCKS) {
+            for (int i = 0; i < CTUtil.getStacks(item).size(); i++) {
+                ModelLoader.setCustomModelResourceLocation(item, i, new ModelResourceLocation(item.getRegistryName(), "inventory"));
+            }
             GeneralUtil.generateModelFileItem(item);
         }
 
