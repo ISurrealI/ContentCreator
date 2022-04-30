@@ -1,6 +1,7 @@
 package surreal.contentcreator.util;
 
 import com.google.gson.JsonObject;
+import net.minecraft.block.SoundType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.Item;
 import net.minecraftforge.fluids.Fluid;
@@ -14,6 +15,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
+
+import static net.minecraft.block.SoundType.*;
+import static net.minecraft.block.SoundType.SLIME;
 
 public class GeneralUtil {
     public static String toUppercase(String name) {
@@ -70,14 +74,12 @@ public class GeneralUtil {
                     e.printStackTrace();
                 }
             }
-        } else if (it instanceof ItemMaterial) {
-            ItemMaterial item = (ItemMaterial) it;
-
+        } else {
             JsonObject object = new JsonObject();
             object.addProperty("parent", "item/generated");
 
             JsonObject texObject = new JsonObject();
-            texObject.addProperty("layer0", ModValues.MODID + ":items/" + item.getRegistryName().getResourcePath());
+            texObject.addProperty("layer0", ModValues.MODID + ":items/" + it.getRegistryName().getResourcePath());
 
             object.add("textures", texObject);
 
@@ -86,8 +88,8 @@ public class GeneralUtil {
                 boolean check = f.exists() || f.mkdirs();
 
                 if (check) {
-                    f = new File(f, item.getRegistryName().getResourcePath() + ".json");
-                    
+                    f = new File(f, it.getRegistryName().getResourcePath() + ".json");
+
                     if (!f.exists()) {
                         FileWriter file = new FileWriter(f);
                         file.write(object.toString());
@@ -136,6 +138,24 @@ public class GeneralUtil {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    public static SoundType get(String name) {
+        switch (name) {
+            case "wood": return WOOD;
+            case "ground": return GROUND;
+            case "plant": return PLANT;
+            case "stone": return STONE;
+            case "metal": return METAL;
+            case "glass": return GLASS;
+            case "cloth": return CLOTH;
+            case "sand": return SAND;
+            case "snow": return SNOW;
+            case "ladder": return LADDER;
+            case "anvil": return ANVIL;
+            case "slime": return SLIME;
+            default: return null;
         }
     }
 }
