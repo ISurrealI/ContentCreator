@@ -15,6 +15,7 @@ import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import surreal.contentcreator.ModConfig;
 import surreal.contentcreator.ModValues;
 import surreal.contentcreator.client.fluid.CustomFluidStateMapper;
 import surreal.contentcreator.common.item.ItemBase;
@@ -82,14 +83,19 @@ public class ClientProxy extends CommonProxy {
                 ModelLoader.setCustomModelResourceLocation(item, i, item.getModel(i));
             }
 
-            GeneralUtil.generateModelFileItem(item);
+            if (ModConfig.CONFIG.generateFiles) GeneralUtil.generateModelFileItem(item);
         }
 
         for (ItemBlock item : CommonProxy.ITEMBLOCKS) {
             for (int i = 0; i < CTUtil.getStacks(item).size(); i++) {
                 ModelLoader.setCustomModelResourceLocation(item, i, new ModelResourceLocation(item.getRegistryName(), "inventory"));
             }
-            GeneralUtil.generateModelFileItem(item);
+            if (ModConfig.CONFIG.generateFiles) GeneralUtil.generateModelFileItem(item);
+        }
+
+        if (ModConfig.CONFIG.generateFiles) {
+            GeneralUtil.generateFiles();
+            GeneralUtil.generateFluidFiles(FLUIDS);
         }
     }
 }

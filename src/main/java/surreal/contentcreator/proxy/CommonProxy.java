@@ -39,11 +39,7 @@ public class CommonProxy {
     }
 
     public void preInit(FMLPreInitializationEvent event) {
-        GeneralUtil.generateFiles();
-        GeneralUtil.generateFluidFiles(FLUIDS);
-
         registerFluids();
-
         init();
     }
 
