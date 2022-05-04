@@ -14,11 +14,8 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.oredict.OreDictionary;
-import surreal.contentcreator.common.block.BlockBase;
 import surreal.contentcreator.common.fluid.FluidBase;
 import surreal.contentcreator.common.fluid.FluidBlockBase;
-import surreal.contentcreator.common.item.ItemMaterial;
-import surreal.contentcreator.common.material.MaterialPart;
 import surreal.contentcreator.util.CTUtil;
 import surreal.contentcreator.ModValues;
 import surreal.contentcreator.brackets.ItemBracketHandler;
@@ -31,7 +28,6 @@ import java.util.List;
 @Mod.EventBusSubscriber(modid = ModValues.MODID)
 public class CommonProxy {
     public static List<ItemBase> ITEMS = new ArrayList<>();
-    public static List<ItemMaterial> MATERIAL_ITEMS = new ArrayList<>();
     public static List<ItemBlock> ITEMBLOCKS = new ArrayList<>();
 
     public static List<Block> BLOCKS = new ArrayList<>();
@@ -43,8 +39,6 @@ public class CommonProxy {
     }
 
     public void preInit(FMLPreInitializationEvent event) {
-        MaterialPart.init();
-
         GeneralUtil.generateFiles();
         GeneralUtil.generateFluidFiles(FLUIDS);
 
@@ -78,13 +72,6 @@ public class CommonProxy {
     public static void registerItems(RegistryEvent.Register<Item> event) {
         event.getRegistry().registerAll(ITEMS.toArray(new Item[ITEMS.size()]));
         event.getRegistry().registerAll(ITEMBLOCKS.toArray(new ItemBlock[ITEMBLOCKS.size()]));
-
-        for (MaterialPart type : MaterialPart.TYPES) {
-            if (type.getMaterials() == null) continue;
-
-            ItemMaterial item = new ItemMaterial(type);
-            event.getRegistry().register(item);
-        }
     }
 
     @SubscribeEvent
@@ -113,15 +100,6 @@ public class CommonProxy {
                         OreDictionary.registerOre(ore, new ItemStack(item));
                     }
                 }
-            }
-        }
-
-        for (MaterialPart part : MaterialPart.TYPES) {
-            ItemMaterial item = ItemMaterial.getItemFromPart(part);
-            if (item == null) continue;
-
-            for (int i = 0; i < part.getMaterials().size(); i++) {
-                OreDictionary.registerOre(item.getOre(i), new ItemStack(item, 1, i));
             }
         }
     }

@@ -9,7 +9,6 @@ import org.apache.commons.lang3.text.WordUtils;
 import surreal.contentcreator.ModValues;
 import surreal.contentcreator.common.fluid.FluidBase;
 import surreal.contentcreator.common.item.ItemBase;
-import surreal.contentcreator.common.item.ItemMaterial;
 
 import java.io.File;
 import java.io.FileWriter;
