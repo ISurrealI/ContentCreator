@@ -56,8 +56,8 @@ public class ItemBase extends Item implements IEdible {
     }
 
     @ZenMethod
-    public static ValueItem create() {
-        return new ValueItem();
+    public static ValueItem create(int meta) {
+        return new ValueItem(meta);
     }
 
     @ZenMethod
@@ -80,7 +80,7 @@ public class ItemBase extends Item implements IEdible {
                 }
             }
         } else {
-            addItem(create());
+            addItem(create(0));
         }
 
         CommonProxy.ITEMS.add((ItemBase) this.setUnlocalizedName(ModValues.MODID + "." + this.getRegistryName().getResourcePath()));
@@ -226,12 +226,15 @@ public class ItemBase extends Item implements IEdible {
     }
 
     @ZenRegister
-    @ZenClass("mods.contentcreator.item.ValueItem")
+    @ZenClass("contentcreator.item.ValueItem")
     public static class ValueItem {
         public String unlocName = null;
 
         // model
         public String modelLocation = null;
+        
+        // metadata
+        public final int meta;
 
         public int maxDamage = 0;
         public int entityHitDamage = 0;
@@ -266,8 +269,9 @@ public class ItemBase extends Item implements IEdible {
         // ores
         public String[] ores = null;
 
-        public ValueItem() {
+        public ValueItem(int meta) {
             this.toolClasses = new HashMap<>();
+            this.meta = meta;
         }
 
         @ZenMethod("setUnlocalizedName")
@@ -333,12 +337,6 @@ public class ItemBase extends Item implements IEdible {
         @ZenMethod
         public ValueItem setEntityHitDamage(int entityHitDamage) {
             this.entityHitDamage = entityHitDamage;
-            return this;
-        }
-
-        @ZenMethod
-        public ValueItem setEfficiency(float efficiency) {
-            this.destroySpeed = efficiency;
             return this;
         }
 
