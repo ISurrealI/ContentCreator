@@ -1,3 +1,7 @@
+// Don't forget to add this, because normally ct works in the postInit phase which it's after the registeries done
+// Also you can't add recipes or anything that needs to be done in normal ct loader phase
+#loader preInit
+
 import contentcreator.block.BlockBase;
 
 // [STATIC]
