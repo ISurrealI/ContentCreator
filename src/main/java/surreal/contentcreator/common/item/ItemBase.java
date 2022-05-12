@@ -51,12 +51,12 @@ public class ItemBase extends Item implements IEdible {
     }
 
     @ZenMethod
-    public static ItemBase createItem(String name) {
+    public static ItemBase create(String name) {
         return (ItemBase) new ItemBase().setRegistryName(ModValues.MODID, name).setCreativeTab(CreativeTabs.SEARCH);
     }
 
     @ZenMethod
-    public static ValueItem create(int meta) {
+    public static ValueItem createValue(int meta) {
         return new ValueItem(meta);
     }
 
@@ -80,7 +80,7 @@ public class ItemBase extends Item implements IEdible {
                 }
             }
         } else {
-            addItem(create(0));
+            addItem(createValue(0));
         }
 
         CommonProxy.ITEMS.add((ItemBase) this.setUnlocalizedName(ModValues.MODID + "." + this.getRegistryName().getResourcePath()));

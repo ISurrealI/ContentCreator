@@ -3,6 +3,7 @@ package surreal.contentcreator.common.block;
 import crafttweaker.annotations.ZenRegister;
 import crafttweaker.api.block.IMaterial;
 import crafttweaker.api.minecraft.CraftTweakerMC;
+import crafttweaker.api.util.IAxisAlignedBB;
 import crafttweaker.api.world.IFacing;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -29,10 +30,10 @@ import surreal.contentcreator.functions.IItemBlockCheck;
 import surreal.contentcreator.proxy.CommonProxy;
 import surreal.contentcreator.types.CTSoundType;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
 @ZenRegister
 @ZenClass("contentcreator.block.BlockBase")
@@ -41,9 +42,9 @@ public class BlockBase extends Block {
     private static PropertyInteger INT = null;
 
     private AxisAlignedBB AABB = FULL_BLOCK_AABB;
+    private AxisAlignedBB COLLISION = FULL_BLOCK_AABB;
 
     private boolean PASSABLE;
-    private boolean FULLCUBE = true;
     private boolean OPAQUE = true;
 
     private IItemBlockCheck ITEM_CHECK = null;
@@ -157,7 +158,7 @@ public class BlockBase extends Block {
         return (BlockBase) super.setHardness(hardness);
     }
 
-    @ZenMethod("setHardnessAndResistance")
+    @ZenMethod("setStrength")
     public BlockBase setHardNRes(float fl) {
         this.setHardness(fl);
         return setRes(fl);
@@ -169,12 +170,6 @@ public class BlockBase extends Block {
         return this;
     }
 
-    @ZenMethod
-    public BlockBase setFullCube() {
-        this.FULLCUBE = false;
-        return this;
-    }
-
     @ZenMethod("setUnbreakable")
     public BlockBase setUnbreak() {
         return (BlockBase) super.setBlockUnbreakable();
@@ -183,6 +178,40 @@ public class BlockBase extends Block {
     @ZenMethod("setBoundingBox")
     public BlockBase setAABB(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
         AABB = new AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ);
+        COLLISION = new AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ);
+        return this;
+    }
+
+    @ZenMethod("setBoundingBox")
+    public BlockBase setAABB(IAxisAlignedBB aabb) {
+        AxisAlignedBB box = CraftTweakerMC.getAxisAlignedBB(aabb);
+        AABB = box;
+        COLLISION = box;
+
+        return this;
+    }
+
+    @ZenMethod("setSelectedBox")
+    public BlockBase setSelBox(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+        AABB = new AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ);
+        return this;
+    }
+
+    @ZenMethod("setSelectedBox")
+    public BlockBase setSelBox(IAxisAlignedBB aabb) {
+        AABB = CraftTweakerMC.getAxisAlignedBB(aabb);
+        return this;
+    }
+
+    @ZenMethod("setCollisionBox")
+    public BlockBase setColBox(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+        COLLISION = new AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ);
+        return this;
+    }
+
+    @ZenMethod("setCollisionBox")
+    public BlockBase setColBox(IAxisAlignedBB aabb) {
+        COLLISION = CraftTweakerMC.getAxisAlignedBB(aabb);
         return this;
     }
 
@@ -199,7 +228,7 @@ public class BlockBase extends Block {
     }
 
     @ZenMethod
-    public BlockBase setOpaque() {
+    public BlockBase setNonOpaque() {
         this.OPAQUE = false;
         return this;
     }
@@ -299,8 +328,14 @@ public class BlockBase extends Block {
         return super.getStateForPlacement(world, pos, facing, hitX, hitY, hitZ, meta, placer, hand);
     }
 
+    @Nullable
     @Override
-    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
+        return COLLISION;
+    }
+
+    @Override
+    public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World worldIn, BlockPos pos) {
         return AABB;
     }
 
@@ -311,7 +346,7 @@ public class BlockBase extends Block {
 
     @Override
     public boolean isFullCube(IBlockState state) {
-        return this.FULLCUBE;
+        return this.OPAQUE;
     }
 
     @Override
