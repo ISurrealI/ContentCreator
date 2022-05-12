@@ -11,6 +11,7 @@ import contentcreator.block.SoundType;
 // soundEvent.getName();
 
 // creates a new SoundEvent ("contentcreator:<name>")
+// You need to be in preInit loader (#loader preInit)
 // SoundEvent.create(String name);
 
 // // // CTSoundType // // //
