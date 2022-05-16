@@ -5,8 +5,8 @@
 import contentcreator.item.Item;
 import contentcreator.item.ValueItem;
 
-// [STATIC] Item.createItem(String name); returns Item
-// var exampleItem as Item = Item.createItem("test");
+// [STATIC] Item.create(String name); returns Item
+// var exampleItem as Item = Item.create("test");
 
 // [NOT STATIC] item.addItem(ValueItem... metaItem);
 // adds Meta Item [ValueItem], returns Item
@@ -19,10 +19,10 @@ import contentcreator.item.ValueItem;
 // // // ValueItem Methods // // //
 # NONE OF THEM ARE STATIC AND ALL OF THEM RETURNS ValueItem
 
-// [STATIC] Item.create(int meta);
+// [STATIC] ValueItem.create(int meta);
 // Creates Meta Item, returns ValueItem
 // meta can't be bigger than Short.MAX_VALUE (32,766)
-// var exampleValueItem as ValueItem = Item.create(0);
+// var exampleValueItem as ValueItem = ValueItem.create(0);
 
 // valueItem.setUnlocalizedName(String name);
 // changes the lang key of the item, returns ValueItem
