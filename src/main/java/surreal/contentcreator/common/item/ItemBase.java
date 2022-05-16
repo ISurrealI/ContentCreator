@@ -56,11 +56,6 @@ public class ItemBase extends Item implements IEdible {
     }
 
     @ZenMethod
-    public static ValueItem createValue(int meta) {
-        return new ValueItem(meta);
-    }
-
-    @ZenMethod
     public ItemBase addItem(ValueItem... item) {
         this.METAITEMS.addAll(Arrays.asList(item));
         return this;
@@ -80,7 +75,7 @@ public class ItemBase extends Item implements IEdible {
                 }
             }
         } else {
-            addItem(createValue(0));
+            addItem(ValueItem.create(0));
         }
 
         CommonProxy.ITEMS.add((ItemBase) this.setUnlocalizedName(ModValues.MODID + "." + this.getRegistryName().getResourcePath()));
@@ -428,6 +423,11 @@ public class ItemBase extends Item implements IEdible {
             }
 
             return EnumAction.NONE;
+        }
+
+        @ZenMethod
+        public static ValueItem create(int meta) {
+            return new ValueItem(meta);
         }
     }
 }
