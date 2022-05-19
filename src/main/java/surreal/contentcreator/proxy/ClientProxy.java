@@ -1,13 +1,17 @@
 package surreal.contentcreator.proxy;
 
+import crafttweaker.api.minecraft.CraftTweakerMC;
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelBakery;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.renderer.color.IBlockColor;
 import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.ModelLoader;
@@ -18,6 +22,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import surreal.contentcreator.ModConfig;
 import surreal.contentcreator.ModValues;
 import surreal.contentcreator.client.fluid.CustomFluidStateMapper;
+import surreal.contentcreator.common.block.BlockBase;
 import surreal.contentcreator.common.item.ItemBase;
 import surreal.contentcreator.util.CTUtil;
 import surreal.contentcreator.util.GeneralUtil;
@@ -45,10 +50,23 @@ public class ClientProxy extends CommonProxy {
         return 0xFFFFFF;
     };
 
+    public static final IBlockColor BLOCKCOLOR = (state, worldIn, pos, tintIndex) -> {
+        if (state.getBlock() instanceof BlockBase) {
+            BlockBase block = (BlockBase) state.getBlock();
+            if (block.COLOR_CHECK != null) return block.COLOR_CHECK.colorMultiplier(CraftTweakerMC.getBlockState(state), worldIn instanceof World ? CraftTweakerMC.getIWorld((World) worldIn) : null, CraftTweakerMC.getIBlockPos(pos), tintIndex);
+        }
+
+        return 0xFFFFFF;
+    };
+
     @Override
     public void init(FMLInitializationEvent event) {
         for (ItemBase item : CommonProxy.ITEMS) {
             Minecraft.getMinecraft().getItemColors().registerItemColorHandler(ITEMCOLOR, item);
+        }
+
+        for (Block block : CommonProxy.BLOCKS) {
+            if (block instanceof BlockBase) Minecraft.getMinecraft().getBlockColors().registerBlockColorHandler(BLOCKCOLOR, block);
         }
     }
 

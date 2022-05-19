@@ -26,6 +26,7 @@ import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
 import surreal.contentcreator.ModValues;
 import surreal.contentcreator.common.item.ItemBlockBase;
+import surreal.contentcreator.functions.IBlockColorCheck;
 import surreal.contentcreator.functions.IItemBlockCheck;
 import surreal.contentcreator.proxy.CommonProxy;
 import surreal.contentcreator.types.CTSoundType;
@@ -48,6 +49,7 @@ public class BlockBase extends Block {
     private boolean OPAQUE = true;
 
     private IItemBlockCheck ITEM_CHECK = null;
+    public IBlockColorCheck COLOR_CHECK = null;
     private boolean added = false;
     public int itemCount = 0;
 
@@ -72,6 +74,12 @@ public class BlockBase extends Block {
 
             itemCount++;
         }
+    }
+
+    @ZenMethod
+    public BlockBase colorCheck(IBlockColorCheck check) {
+        COLOR_CHECK = check;
+        return this;
     }
 
     @ZenMethod
