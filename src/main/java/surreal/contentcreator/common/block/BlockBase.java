@@ -77,7 +77,7 @@ public class BlockBase extends Block {
     }
 
     @ZenMethod
-    public BlockBase colorCheck(IBlockColorCheck check) {
+    public BlockBase checkColor(IBlockColorCheck check) {
         COLOR_CHECK = check;
         return this;
     }
