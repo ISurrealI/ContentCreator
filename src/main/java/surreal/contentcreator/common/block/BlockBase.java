@@ -37,7 +37,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @ZenRegister
-@ZenClass("contentcreator.block.BlockBase")
+@ZenClass("contentcreator.block.Block")
 public class BlockBase extends Block {
     private static PropertyDirection FACING = null;
     private static PropertyInteger INT = null;
