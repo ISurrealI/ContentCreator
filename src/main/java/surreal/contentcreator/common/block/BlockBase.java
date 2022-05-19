@@ -596,9 +596,8 @@ public class BlockBase extends Block {
         return this;
     }
 
-    @Nonnull
-    @ZenMethod
-    public BlockBase setHardness(float hardness) {
+    @ZenMethod("setHardness")
+    public BlockBase setHard(float hardness) {
         this.HARDNESS = (state, world, pos) -> hardness;
         return this;
     }
@@ -609,9 +608,8 @@ public class BlockBase extends Block {
         return this;
     }
 
-    @Nonnull
-    @ZenMethod
-    public BlockBase setResistance(float resistance) {
+    @ZenMethod("setResistance")
+    public BlockBase setRes(float resistance) {
         this.RESISTANCE = (world, pos, entity, explosion) -> resistance;
         return this;
     }
@@ -949,9 +947,8 @@ public class BlockBase extends Block {
         return this;
     }
 
-    @Nonnull
-    @ZenMethod
-    public BlockBase setLightOpacity(int lightOpacity) {
+    @ZenMethod("setLightOpacity")
+    public BlockBase setLO(int lightOpacity) {
         this.LIGHTOPACITY = (state, world, pos) -> lightOpacity;
         return this;
     }
@@ -967,7 +964,7 @@ public class BlockBase extends Block {
         this.ENTITYDESTROY = func;
         return this;
     }
-// Bruh
+
     @ZenMethod
     public BlockBase setBeaconBase(IBlockBeaconBaseFunc func) {
         this.BEACONBASE = func;
