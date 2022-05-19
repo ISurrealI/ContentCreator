@@ -108,7 +108,6 @@ public class ClientProxy extends CommonProxy {
             for (int i = 0; i < CTUtil.getStacks(item).size(); i++) {
                 ModelLoader.setCustomModelResourceLocation(item, i, new ModelResourceLocation(item.getRegistryName(), "inventory"));
             }
-            if (ModConfig.CONFIG.generateFiles) GeneralUtil.generateModelFileItem(item);
         }
 
         if (ModConfig.CONFIG.generateFiles) {
