@@ -2,28 +2,27 @@ package surreal.contentcreator.proxy;
 
 import crafttweaker.api.minecraft.CraftTweakerMC;
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.block.model.ModelBakery;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.color.IBlockColor;
 import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
+import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
 import surreal.contentcreator.ModConfig;
-import surreal.contentcreator.ModValues;
 import surreal.contentcreator.client.fluid.CustomFluidStateMapper;
 import surreal.contentcreator.common.block.BlockBase;
 import surreal.contentcreator.common.item.ItemBase;
+import surreal.contentcreator.common.item.ItemBlockBase;
 import surreal.contentcreator.util.CTUtil;
 import surreal.contentcreator.util.GeneralUtil;
 import surreal.contentcreator.util.TintColor;
@@ -32,7 +31,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-@Mod.EventBusSubscriber(modid = ModValues.MODID)
+@Mod.EventBusSubscriber(value = Side.CLIENT)
 public class ClientProxy extends CommonProxy {
     public static final List<ResourceLocation> fluidTextures = new ArrayList<>();
     private static final List<TintColor> DEFAULTITEMCOLOR = Collections.singletonList(new TintColor(0, 0xFFFFFF));
@@ -50,25 +49,23 @@ public class ClientProxy extends CommonProxy {
         return 0xFFFFFF;
     };
 
-    public static final IBlockColor BLOCKCOLOR = (state, worldIn, pos, tintIndex) -> {
-        if (state.getBlock() instanceof BlockBase) {
-            BlockBase block = (BlockBase) state.getBlock();
-            if (block.COLOR_CHECK != null) return block.COLOR_CHECK.colorMultiplier(CraftTweakerMC.getBlockState(state), worldIn instanceof World ? CraftTweakerMC.getIWorld((World) worldIn) : null, CraftTweakerMC.getIBlockPos(pos), tintIndex);
+    public static final IItemColor ITEMBLOCKCOLOR = (ItemStack stack, int index) -> {
+        if (stack.getItem() instanceof ItemBlockBase) {
+            ItemBlockBase item = (ItemBlockBase) stack.getItem();
+            return item.blockBase.COLOR.colorMultiplier(CraftTweakerMC.getBlockState(item.blockBase.getStateFromMeta(stack.getMetadata())), index);
         }
 
         return 0xFFFFFF;
     };
 
-    @Override
-    public void init(FMLInitializationEvent event) {
-        for (ItemBase item : CommonProxy.ITEMS) {
-            Minecraft.getMinecraft().getItemColors().registerItemColorHandler(ITEMCOLOR, item);
+    public static final IBlockColor BLOCKCOLOR = (state, worldIn, pos, tintIndex) -> {
+        if (state.getBlock() instanceof BlockBase) {
+            BlockBase block = (BlockBase) state.getBlock();
+            if (block.COLOR != null) return block.COLOR.colorMultiplier(CraftTweakerMC.getBlockState(state), tintIndex);
         }
 
-        for (Block block : CommonProxy.BLOCKS) {
-            if (block instanceof BlockBase) Minecraft.getMinecraft().getBlockColors().registerBlockColorHandler(BLOCKCOLOR, block);
-        }
-    }
+        return 0xFFFFFF;
+    };
 
     private static void registerSprites(TextureMap map) {
         for (ResourceLocation location : fluidTextures) {
@@ -113,6 +110,24 @@ public class ClientProxy extends CommonProxy {
         if (ModConfig.CONFIG.generateFiles) {
             GeneralUtil.generateFiles();
             GeneralUtil.generateFluidFiles(FLUIDS);
+        }
+    }
+
+    @SubscribeEvent
+    public static void regColorsBlock(ColorHandlerEvent.Block event) {
+        for (Block block : CommonProxy.BLOCKS) {
+            event.getBlockColors().registerBlockColorHandler(BLOCKCOLOR, block);
+        }
+    }
+
+    @SubscribeEvent
+    public static void regColorsItem(ColorHandlerEvent.Item event) {
+        for (Item item : CommonProxy.ITEMS) {
+            event.getItemColors().registerItemColorHandler(ITEMCOLOR, item);
+        }
+
+        for (Item item : CommonProxy.ITEMBLOCKS) {
+            event.getItemColors().registerItemColorHandler(ITEMBLOCKCOLOR, item);
         }
     }
 }

@@ -4,10 +4,13 @@ import net.minecraft.item.ItemBlock;
 import surreal.contentcreator.common.block.BlockBase;
 
 public class ItemBlockBase extends ItemBlock {
+    public BlockBase blockBase;
+
     public ItemBlockBase(BlockBase block) {
         super(block);
+        this.blockBase = block;
         this.setRegistryName(block.getRegistryName()).setUnlocalizedName(block.getUnlocalizedName());
-        this.setHasSubtypes(block.itemCount > 1);
+        this.setHasSubtypes(true);
     }
 
     @Override

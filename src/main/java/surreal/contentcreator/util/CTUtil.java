@@ -1,6 +1,10 @@
 package surreal.contentcreator.util;
 
 import crafttweaker.api.enchantments.IEnchantmentDefinition;
+import crafttweaker.api.util.IRandom;
+import crafttweaker.api.world.IBlockAccess;
+import crafttweaker.mc1120.util.MCRandom;
+import crafttweaker.mc1120.world.MCBlockAccess;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.EnumRarity;
@@ -13,6 +17,7 @@ import surreal.contentcreator.common.item.ItemBase;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 public class CTUtil {
     public static Enchantment[] getEnchantments(IEnchantmentDefinition[] enchantments) {
@@ -68,5 +73,13 @@ public class CTUtil {
         }
 
         return null;
+    }
+
+    public static IBlockAccess getIBlockAccess(net.minecraft.world.IBlockAccess world) {
+        return new MCBlockAccess(world);
+    }
+
+    public static IRandom getRandom(Random random) {
+        return new MCRandom(random);
     }
 }

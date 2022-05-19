@@ -1,0 +1,12 @@
+{
+  "parent": "contentcreator:block/tinted_cube_base",
+  "textures": {
+    "particle": "#all",
+    "down": "#all",
+    "up": "#all",
+    "north": "#all",
+    "east": "#all",
+    "south": "#all",
+    "west": "#all"
+  }
+}
