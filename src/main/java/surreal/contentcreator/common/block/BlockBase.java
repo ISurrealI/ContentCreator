@@ -112,7 +112,7 @@ public class BlockBase extends Block {
     private IBlockStateBooleanFunc STICKY = null;
 
     // Item Functions
-    private IUnlocalizedNameFunc ITEMUNLOCNAME = null;
+    public IUnlocalizedNameFunc ITEMUNLOCNAME = null;
     private IBlockSubItemFunc SUBITEM = null;
 
     // Properties
