@@ -33,6 +33,7 @@ import java.util.List;
 
 @Mod.EventBusSubscriber(value = Side.CLIENT)
 public class ClientProxy extends CommonProxy {
+    public static final List<String> texturesToRegister = new ArrayList<>();
     public static final List<ResourceLocation> fluidTextures = new ArrayList<>();
     private static final List<TintColor> DEFAULTITEMCOLOR = Collections.singletonList(new TintColor(0, 0xFFFFFF));
 
@@ -70,6 +71,10 @@ public class ClientProxy extends CommonProxy {
     private static void registerSprites(TextureMap map) {
         for (ResourceLocation location : fluidTextures) {
             map.registerSprite(location);
+        }
+
+        for (String location : texturesToRegister) {
+            map.registerSprite(new ResourceLocation(location));
         }
     }
 
