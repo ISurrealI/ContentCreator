@@ -3,12 +3,10 @@ package surreal.contentcreator.util;
 import com.google.gson.JsonObject;
 import net.minecraft.block.SoundType;
 import net.minecraft.client.Minecraft;
-import net.minecraft.item.Item;
 import net.minecraftforge.fluids.Fluid;
 import org.apache.commons.lang3.text.WordUtils;
 import surreal.contentcreator.ModValues;
 import surreal.contentcreator.common.fluid.FluidBase;
-import surreal.contentcreator.common.item.ItemBase;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -35,66 +33,6 @@ public class GeneralUtil {
         if (!file.exists()) {
             try {
                 file.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public static void generateModelFileItem(Item it) {
-        if (it instanceof ItemBase) {
-            ItemBase item = (ItemBase) it;
-
-            for (int i = 0; i < item.METAITEMS.size(); i++) {
-                JsonObject object = new JsonObject();
-
-                object.addProperty("parent", "item/generated");
-
-                JsonObject texObject = new JsonObject();
-                texObject.addProperty("layer0", ModValues.MODID + ":items/" + item.getModel(i).getResourcePath());
-
-                object.add("textures", texObject);
-
-                try {
-                    File f = new File(Minecraft.getMinecraft().mcDataDir, "resources/" + ModValues.MODID + "/models/item");
-                    boolean check = f.exists() || f.mkdirs();
-
-                    if (check) {
-                        f = new File(f, item.getModel(i).getResourcePath() + ".json");
-
-                        if (!f.exists()) {
-                            FileWriter file = new FileWriter(f);
-                            file.write(object.toString());
-                            file.close();
-                        }
-                    }
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        } else {
-            JsonObject object = new JsonObject();
-            object.addProperty("parent", "item/generated");
-
-            JsonObject texObject = new JsonObject();
-            texObject.addProperty("layer0", ModValues.MODID + ":items/" + it.getRegistryName().getResourcePath());
-
-            object.add("textures", texObject);
-
-            try {
-                File f = new File(Minecraft.getMinecraft().mcDataDir, "resources/" + ModValues.MODID + "/models/item");
-                boolean check = f.exists() || f.mkdirs();
-
-                if (check) {
-                    f = new File(f, it.getRegistryName().getResourcePath() + ".json");
-
-                    if (!f.exists()) {
-                        FileWriter file = new FileWriter(f);
-                        file.write(object.toString());
-                        file.close();
-                    }
-                }
             } catch (IOException e) {
                 e.printStackTrace();
             }

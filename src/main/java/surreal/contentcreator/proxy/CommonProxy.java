@@ -14,13 +14,14 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.oredict.OreDictionary;
+import net.minecraftforge.registries.IForgeRegistry;
 import surreal.contentcreator.common.fluid.FluidBase;
 import surreal.contentcreator.common.fluid.FluidBlockBase;
+import surreal.contentcreator.common.item.ItemBase;
+import surreal.contentcreator.common.item.SubItem;
 import surreal.contentcreator.util.CTUtil;
 import surreal.contentcreator.ModValues;
 import surreal.contentcreator.brackets.ItemBracketHandler;
-import surreal.contentcreator.common.item.ItemBase;
-import surreal.contentcreator.util.GeneralUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,39 +62,32 @@ public class CommonProxy {
 
     @SubscribeEvent
     public static void registerSounds(RegistryEvent.Register<SoundEvent> event) {
-        event.getRegistry().registerAll(SOUNDS.toArray(new SoundEvent[SOUNDS.size()]));
+        IForgeRegistry<SoundEvent> registry = event.getRegistry();
+        SOUNDS.forEach(registry::register);
     }
 
     @SubscribeEvent
     public static void registerItems(RegistryEvent.Register<Item> event) {
-        event.getRegistry().registerAll(ITEMS.toArray(new Item[ITEMS.size()]));
-        event.getRegistry().registerAll(ITEMBLOCKS.toArray(new ItemBlock[ITEMBLOCKS.size()]));
+        IForgeRegistry<Item> registry = event.getRegistry();
+        ITEMS.forEach(registry::register);
+        ITEMBLOCKS.forEach(registry::register);
     }
 
     @SubscribeEvent
     public static void registerBlocks(RegistryEvent.Register<Block> event) {
-        event.getRegistry().registerAll(BLOCKS.toArray(new Block[BLOCKS.size()]));
+        IForgeRegistry<Block> registry = event.getRegistry();
+        BLOCKS.forEach(registry::register);
     }
     
     @SubscribeEvent
     public static void registerRecipes(RegistryEvent.Register<IRecipe> event) {
         for (ItemBase item : ITEMS) {
-            if (item.METAITEMS.size() > 1) {
-                for (int i = 0; i < item.METAITEMS.size(); i++) {
-                    ItemBase.ValueItem value = item.METAITEMS.get(i);
+            for (int i = 0; i < item.SUBITEMS.size(); i++) {
+                SubItem value = item.SUBITEMS.get(i);
 
-                    if (value.ores != null) {
-                        for (String ore : value.ores) {
-                            OreDictionary.registerOre(ore, new ItemStack(item, 1, i));
-                        }
-                    }
-                }
-            } else {
-                ItemBase.ValueItem value = item.METAITEMS.get(0);
-
-                if (value.ores != null) {
-                    for (String ore : value.ores) {
-                        OreDictionary.registerOre(ore, new ItemStack(item));
+                if (value.oreList != null) {
+                    for (String ore : value.oreList) {
+                        OreDictionary.registerOre(ore, new ItemStack(item, 1, i));
                     }
                 }
             }

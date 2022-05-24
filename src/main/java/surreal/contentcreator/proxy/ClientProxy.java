@@ -23,28 +23,23 @@ import surreal.contentcreator.client.fluid.CustomFluidStateMapper;
 import surreal.contentcreator.common.block.BlockBase;
 import surreal.contentcreator.common.item.ItemBase;
 import surreal.contentcreator.common.item.ItemBlockBase;
+import surreal.contentcreator.functions.item.IItemColorFunc;
 import surreal.contentcreator.util.CTUtil;
 import surreal.contentcreator.util.GeneralUtil;
-import surreal.contentcreator.util.TintColor;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Mod.EventBusSubscriber(value = Side.CLIENT)
 public class ClientProxy extends CommonProxy {
     public static final List<String> texturesToRegister = new ArrayList<>();
     public static final List<ResourceLocation> fluidTextures = new ArrayList<>();
-    private static final List<TintColor> DEFAULTITEMCOLOR = Collections.singletonList(new TintColor(0, 0xFFFFFF));
 
-    public static final IItemColor ITEMCOLOR = (ItemStack stack, int index) -> {
+    public static final IItemColor ITEMCOLOR = (stack, tintIndex) -> {
         if (stack.getItem() instanceof ItemBase) {
             ItemBase item = (ItemBase) stack.getItem();
-            if (item.COLOR == null) return 0xFFFFFF;
-
-            for (TintColor tintColor : item.COLOR.getOrDefault(stack.getMetadata(), DEFAULTITEMCOLOR)) {
-                if (tintColor.getTintIndex() == index) return tintColor.getValue();
-            }
+            IItemColorFunc color = item.SUBITEMS.get(stack.getMetadata()).COLOR;
+            if (color != null) return color.colorMultiplier(CraftTweakerMC.getIItemStack(stack), tintIndex);
         }
 
         return 0xFFFFFF;
@@ -99,11 +94,9 @@ public class ClientProxy extends CommonProxy {
         registerMappers();
 
         for (ItemBase item : CommonProxy.ITEMS) {
-            for (int i = 0; i < CTUtil.getStacks(item).size(); i++) {
-                ModelLoader.setCustomModelResourceLocation(item, i, item.getModel(i));
+            for (int i = 0; i < item.SUBITEMS.size(); i++) {
+                ModelLoader.setCustomModelResourceLocation(item, i, new ModelResourceLocation(item.getModelLocation(i)));
             }
-
-            if (ModConfig.CONFIG.generateFiles) GeneralUtil.generateModelFileItem(item);
         }
 
         for (ItemBlock item : CommonProxy.ITEMBLOCKS) {
