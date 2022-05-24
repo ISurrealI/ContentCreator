@@ -41,7 +41,7 @@ import stanhebben.zenscript.annotations.ZenMethod;
 import surreal.contentcreator.ModValues;
 import surreal.contentcreator.common.item.ItemBlockBase;
 import surreal.contentcreator.functions.block.*;
-import surreal.contentcreator.functions.item.IUnlocalizedNameFunc;
+import surreal.contentcreator.functions.item.IItemUnlocalizedNameFunc;
 import surreal.contentcreator.proxy.CommonProxy;
 import surreal.contentcreator.util.CTUtil;
 
@@ -112,7 +112,7 @@ public class BlockBase extends Block {
     private IBlockStateBooleanFunc STICKY = null;
 
     // Item Functions
-    public IUnlocalizedNameFunc ITEMUNLOCNAME = null;
+    public IItemUnlocalizedNameFunc ITEMUNLOCNAME = null;
     private IBlockSubItemFunc SUBITEM = null;
 
     // Properties
@@ -295,7 +295,7 @@ public class BlockBase extends Block {
 
     @Override
     public boolean onBlockActivated(@Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull IBlockState state, @Nonnull EntityPlayer playerIn, @Nonnull EnumHand hand, @Nonnull EnumFacing facing, float hitX, float hitY, float hitZ) {
-        return ACTIVATED != null ? ACTIVATED.onBlockActivated(CraftTweakerMC.getIWorld(worldIn), CraftTweakerMC.getIBlockPos(pos), CraftTweakerMC.getBlockState(state), CraftTweakerMC.getIPlayer(playerIn), CraftTweakerMC.getIItemStack(playerIn.getHeldItem(hand)), CraftTweakerMC.getIFacing(facing), hitX, hitY, hitZ) : super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ);
+        return ACTIVATED != null ? ACTIVATED.onBlockActivated(CraftTweakerMC.getIWorld(worldIn), CraftTweakerMC.getIBlockPos(pos), CraftTweakerMC.getBlockState(state), CraftTweakerMC.getIPlayer(playerIn), CraftTweakerMC.getIItemStackMutable(playerIn.getHeldItem(hand)), CraftTweakerMC.getIFacing(facing), hitX, hitY, hitZ) : super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ);
     }
 
     @Override
@@ -333,7 +333,7 @@ public class BlockBase extends Block {
 
     @Override
     public void onBlockPlacedBy(@Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull IBlockState state, @Nonnull EntityLivingBase placer, @Nonnull ItemStack stack) {
-        if (PLACEDBY != null) PLACEDBY.onBlockPlacedBy(CraftTweakerMC.getIWorld(worldIn), CraftTweakerMC.getIBlockPos(pos), CraftTweakerMC.getBlockState(state), CraftTweakerMC.getIEntityLivingBase(placer), CraftTweakerMC.getIItemStack(stack));
+        if (PLACEDBY != null) PLACEDBY.onBlockPlacedBy(CraftTweakerMC.getIWorld(worldIn), CraftTweakerMC.getIBlockPos(pos), CraftTweakerMC.getBlockState(state), CraftTweakerMC.getIEntityLivingBase(placer), CraftTweakerMC.getIItemStackMutable(stack));
         else super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
     }
 
@@ -816,7 +816,7 @@ public class BlockBase extends Block {
     }
 
     @ZenMethod
-    public BlockBase setUnlocalizedName(IUnlocalizedNameFunc func) {
+    public BlockBase setUnlocalizedName(IItemUnlocalizedNameFunc func) {
         this.ITEMUNLOCNAME = func;
         return this;
     }
