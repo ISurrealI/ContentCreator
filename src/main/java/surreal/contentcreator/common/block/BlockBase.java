@@ -261,7 +261,7 @@ public class BlockBase extends Block {
     public void neighborChanged(@Nonnull IBlockState state, @Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull Block blockIn, @Nonnull BlockPos fromPos) {
         IWorld iworld = CraftTweakerMC.getIWorld(worldIn);
         IBlockPos ipos = CraftTweakerMC.getIBlockPos(pos);
-        if (shouldDrop && (PLACE != null && !PLACE.canPlaceBlockAt(iworld, ipos))) this.dropBlockAsItem(worldIn, pos, state, 0);
+        if (shouldDrop && (PLACE != null && !PLACE.canPlaceBlockAt(iworld, ipos))) this.dropBlock(iworld, ipos, 1F, 0);
         if (NEIGHBORCHANGED != null) NEIGHBORCHANGED.onNeighborChanged(CraftTweakerMC.getBlockState(state), CraftTweakerMC.getIWorld(worldIn), CraftTweakerMC.getIBlockPos(pos), CraftTweakerMC.getBlockDefinition(blockIn), CraftTweakerMC.getIBlockPos(fromPos));
         else super.neighborChanged(state, worldIn, pos, blockIn, fromPos);
     }
