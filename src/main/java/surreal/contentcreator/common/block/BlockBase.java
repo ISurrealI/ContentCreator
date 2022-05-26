@@ -2,6 +2,7 @@ package surreal.contentcreator.common.block;
 
 import com.google.common.collect.ImmutableList;
 import crafttweaker.annotations.ZenRegister;
+import crafttweaker.api.block.IBlockStateMatcher;
 import crafttweaker.api.block.IMaterial;
 import crafttweaker.api.minecraft.CraftTweakerMC;
 import crafttweaker.api.util.IAxisAlignedBB;
@@ -46,6 +47,7 @@ import surreal.contentcreator.common.item.ItemBlockBase;
 import surreal.contentcreator.functions.block.*;
 import surreal.contentcreator.functions.item.IItemUnlocalizedNameFunc;
 import surreal.contentcreator.proxy.CommonProxy;
+import surreal.contentcreator.types.CTSoundType;
 import surreal.contentcreator.util.CTUtil;
 
 import javax.annotation.Nonnull;
@@ -234,8 +236,8 @@ public class BlockBase extends Block {
 
     @Nonnull
     @Override
-    public AxisAlignedBB getSelectedBoundingBox(@Nonnull IBlockState state, @Nonnull World worldIn, @Nonnull BlockPos pos) {
-        return SELECTED_BOX != null ? SELECTED_BOX : super.getSelectedBoundingBox(state, worldIn, pos);
+    public AxisAlignedBB getBoundingBox(@Nonnull IBlockState state, @Nonnull IBlockAccess source, @Nonnull BlockPos pos) {
+        return SELECTED_BOX != null ? SELECTED_BOX : super.getBoundingBox(state, source, pos);
     }
 
     @Override
@@ -603,6 +605,12 @@ public class BlockBase extends Block {
         return this;
     }
 
+    @ZenMethod
+    public BlockBase setMapColor(MapColor color) {
+        this.MAPCOLOR = (state, world, pos) -> color;
+        return this;
+    }
+
     @ZenMethod("setHardness")
     public BlockBase setHard(float hardness) {
         this.HARDNESS = (state, world, pos) -> hardness;
@@ -612,6 +620,12 @@ public class BlockBase extends Block {
     @ZenMethod
     public BlockBase setHardness(IBlockHardnessFunc func) {
         this.HARDNESS = func;
+        return this;
+    }
+
+    @ZenMethod
+    public BlockBase setUnbreakable() {
+        this.HARDNESS = (state, world, pos) -> -1F;
         return this;
     }
 
@@ -711,6 +725,7 @@ public class BlockBase extends Block {
     public BlockBase setBoundingBox(IAxisAlignedBB aabb) {
         if (aabb != null) {
             AxisAlignedBB ab = CraftTweakerMC.getAxisAlignedBB(aabb);
+            if (COLLISION_BOXES == null) COLLISION_BOXES = new ArrayList<>();
             COLLISION_BOXES.add(ab);
             SELECTED_BOX = ab;
         }
@@ -721,6 +736,7 @@ public class BlockBase extends Block {
     @ZenMethod
     public BlockBase setBoundingBox(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
         AxisAlignedBB aabb = new AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ);
+        if (COLLISION_BOXES == null) COLLISION_BOXES = new ArrayList<>();
         COLLISION_BOXES.add(aabb);
         SELECTED_BOX = aabb;
         return this;
@@ -902,7 +918,7 @@ public class BlockBase extends Block {
     }
 
     @ZenMethod
-    public BlockBase isLadder() {
+    public BlockBase setLadder() {
         this.LADDER = (state, world, pos, entity) -> true;
         return this;
     }
@@ -944,7 +960,7 @@ public class BlockBase extends Block {
     }
 
     @ZenMethod
-    public BlockBase isFireSource() {
+    public BlockBase setFireSource() {
         this.FIRESOURCE = (world, pos, facing) -> true;
         return this;
     }
@@ -956,7 +972,7 @@ public class BlockBase extends Block {
     }
 
     @ZenMethod
-    public BlockBase canConnectRedstone() {
+    public BlockBase setConnectRedstone() {
         this.CONNECTREDSTONE = (state, world, pos, facing) -> true;
         return this;
     }
@@ -1010,8 +1026,20 @@ public class BlockBase extends Block {
     }
 
     @ZenMethod
+    public BlockBase setSoundType(CTSoundType soundType) {
+        this.SOUND = (state, world, pos, entity) -> soundType;
+        return this;
+    }
+
+    @ZenMethod
     public BlockBase setBeaconMultiplier(IBlockBeaconMultiplierFunc func) {
         this.BEACONMULTIPLIER = func;
+        return this;
+    }
+
+    @ZenMethod
+    public BlockBase setBeaconMultiplier(float[] multiplier) {
+        this.BEACONMULTIPLIER = (state, world, pos, beaconPos) -> multiplier;
         return this;
     }
 
@@ -1028,8 +1056,45 @@ public class BlockBase extends Block {
     }
 
     @ZenMethod
+    public BlockBase setSticky() {
+        this.STICKY = state -> true;
+        return this;
+    }
+
+    @ZenMethod
     public BlockBase setColor(IBlockColorFunc func) {
         this.COLOR = func;
+        return this;
+    }
+
+    @ZenMethod
+    public BlockBase setColor(int color) {
+        this.COLOR = (state, tintIndex) -> color;
+        return this;
+    }
+
+    @ZenMethod("setHarvestLevel")
+    public BlockBase setHarvestLvl(String tool, int level) {
+        this.setHarvestLevel(tool, level);
+        return this;
+    }
+
+    @ZenMethod("setHarvestLevel")
+    public BlockBase setHarvestLvl(String tool, int level, IBlockStateMatcher matcher) {
+        for (crafttweaker.api.block.IBlockState state : matcher.getMatchingBlockStates()) {
+            this.setHarvestLevel(tool, level, ((IBlockState) state));
+        }
+
+        return this;
+    }
+
+    @ZenMethod("setHarvestLevel")
+    public BlockBase setHarvestLvl(String tool, int level, int[] matcher) {
+        for (int i : matcher) {
+            IBlockState state = getStateFromMeta(i);
+            this.setHarvestLevel(tool, level, state);
+        }
+
         return this;
     }
 

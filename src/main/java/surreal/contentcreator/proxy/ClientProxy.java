@@ -48,7 +48,7 @@ public class ClientProxy extends CommonProxy {
     public static final IItemColor ITEMBLOCKCOLOR = (ItemStack stack, int index) -> {
         if (stack.getItem() instanceof ItemBlockBase) {
             ItemBlockBase item = (ItemBlockBase) stack.getItem();
-            return item.blockBase.COLOR.colorMultiplier(CraftTweakerMC.getBlockState(item.blockBase.getStateFromMeta(stack.getMetadata())), index);
+            if (item.blockBase.COLOR != null) return item.blockBase.COLOR.colorMultiplier(CraftTweakerMC.getBlockState(item.blockBase.getStateFromMeta(stack.getMetadata())), index);
         }
 
         return 0xFFFFFF;
