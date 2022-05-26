@@ -719,6 +719,14 @@ public class BlockBase extends Block {
     }
 
     @ZenMethod
+    public BlockBase setBoundingBox(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
+        AxisAlignedBB aabb = new AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ);
+        COLLISION_BOXES.add(aabb);
+        SELECTED_BOX = aabb;
+        return this;
+    }
+
+    @ZenMethod
     public BlockBase setUpdateTick(IBlockUpdateTickFunc func) {
         UPDATETICK = func;
         return this;
