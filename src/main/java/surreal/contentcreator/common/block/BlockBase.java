@@ -5,7 +5,9 @@ import crafttweaker.annotations.ZenRegister;
 import crafttweaker.api.block.IMaterial;
 import crafttweaker.api.minecraft.CraftTweakerMC;
 import crafttweaker.api.util.IAxisAlignedBB;
+import crafttweaker.api.world.IBlockPos;
 import crafttweaker.api.world.IFacing;
+import crafttweaker.api.world.IWorld;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
@@ -36,6 +38,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import stanhebben.zenscript.annotations.Optional;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
 import surreal.contentcreator.ModValues;
@@ -63,6 +66,7 @@ public class BlockBase extends Block {
     private EnumOffsetType offset = EnumOffsetType.NONE;
     private List<AxisAlignedBB> COLLISION_BOXES = null;
     private AxisAlignedBB SELECTED_BOX = null;
+    private boolean shouldDrop = false;
 
     // Functions
     public IBlockColorFunc COLOR = null;
@@ -255,6 +259,9 @@ public class BlockBase extends Block {
 
     @Override
     public void neighborChanged(@Nonnull IBlockState state, @Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull Block blockIn, @Nonnull BlockPos fromPos) {
+        IWorld iworld = CraftTweakerMC.getIWorld(worldIn);
+        IBlockPos ipos = CraftTweakerMC.getIBlockPos(pos);
+        if (shouldDrop && (PLACE != null && !PLACE.canPlaceBlockAt(iworld, ipos))) this.dropBlockAsItem(worldIn, pos, state, 0);
         if (NEIGHBORCHANGED != null) NEIGHBORCHANGED.onNeighborChanged(CraftTweakerMC.getBlockState(state), CraftTweakerMC.getIWorld(worldIn), CraftTweakerMC.getIBlockPos(pos), CraftTweakerMC.getBlockDefinition(blockIn), CraftTweakerMC.getIBlockPos(fromPos));
         else super.neighborChanged(state, worldIn, pos, blockIn, fromPos);
     }
@@ -1004,6 +1011,23 @@ public class BlockBase extends Block {
     @ZenMethod
     public BlockBase setColor(IBlockColorFunc func) {
         this.COLOR = func;
+        return this;
+    }
+
+    @ZenMethod
+    public void dropBlock(IWorld world, IBlockPos pos, @Optional float chance, @Optional int fortune) {
+        World w = CraftTweakerMC.getWorld(world);
+        BlockPos bp = CraftTweakerMC.getBlockPos(pos);
+        IBlockState state = CraftTweakerMC.getBlockState(world.getBlockState(pos));
+        if (chance == 0) chance = 1F;
+        this.dropBlockAsItemWithChance(w, bp, state, chance, fortune);
+        w.setBlockToAir(bp);
+    }
+
+    // edit canPlace to make this work!
+    @ZenMethod
+    public BlockBase checkAndDropBlock() {
+        this.shouldDrop = true;
         return this;
     }
 
