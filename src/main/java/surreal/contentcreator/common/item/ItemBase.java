@@ -96,6 +96,7 @@ public class ItemBase extends Item implements IEdible {
                 if (classes != null) classes.forEach(this::setHarvestLevel);
             }
         }
+        this.setHasSubtypes(SUBITEMS.size() > 1);
         CommonProxy.ITEMS.add(this);
     }
 

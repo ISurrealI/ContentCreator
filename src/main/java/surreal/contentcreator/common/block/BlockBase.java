@@ -358,7 +358,7 @@ public class BlockBase extends Block {
 
     @Nonnull
     @Override
-    public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
+    public ItemStack getPickBlock(@Nonnull IBlockState state, @Nonnull RayTraceResult target, @Nonnull World world, @Nonnull BlockPos pos, @Nonnull EntityPlayer player) {
         if (SUBITEM != null && SUBITEM.check(CraftTweakerMC.getBlockState(state))) return new ItemStack(this, 1, this.getMetaFromState(state));
         else return super.getPickBlock(state, target, world, pos, player);
     }
