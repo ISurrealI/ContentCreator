@@ -708,6 +708,17 @@ public class BlockBase extends Block {
     }
 
     @ZenMethod
+    public BlockBase setBoundingBox(IAxisAlignedBB aabb) {
+        if (aabb != null) {
+            AxisAlignedBB ab = CraftTweakerMC.getAxisAlignedBB(aabb);
+            COLLISION_BOXES.add(ab);
+            SELECTED_BOX = ab;
+        }
+
+        return this;
+    }
+
+    @ZenMethod
     public BlockBase setUpdateTick(IBlockUpdateTickFunc func) {
         UPDATETICK = func;
         return this;
