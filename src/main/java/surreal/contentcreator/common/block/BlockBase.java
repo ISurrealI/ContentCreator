@@ -627,8 +627,8 @@ public class BlockBase extends Block {
     }
 
     @ZenMethod
-    public BlockBase setOpaque() {
-        this.OPAQUE = state -> true;
+    public BlockBase setNonOpaque() {
+        this.OPAQUE = state -> false;
         return this;
     }
 
