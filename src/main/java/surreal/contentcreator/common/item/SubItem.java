@@ -185,16 +185,6 @@ public class SubItem {
     }
 
     @ZenMethod
-    public SubItem setCustomEntity(IEntityDefinition definition) {
-        this.CUSTOMENTITY = (world, entity, stack) -> {
-            IEntity en = definition.createEntity(world);
-            en.setPosition(entity.getPosition());
-            return en;
-        };
-        return this;
-    }
-
-    @ZenMethod
     public SubItem setEntityItemUpdate(IItemEntityItemUpdateFunc func) {
         this.ENTITYUPDATE = func;
         return this;
@@ -259,6 +249,12 @@ public class SubItem {
     @ZenMethod
     public SubItem canDestroyInCreative(IItemDestroyCreative func) {
         this.DESTROYCREATIVE = func;
+        return this;
+    }
+
+    @ZenMethod
+    public SubItem setNoDestroyInCreative() {
+        this.DESTROYCREATIVE = (world, pos, stack, player) -> false;
         return this;
     }
 
@@ -378,13 +374,19 @@ public class SubItem {
     }
 
     @ZenMethod
+    public SubItem setDisableShield() {
+        this.DISABLESHIED = (stack, shield, entity, attacker) -> true;
+        return this;
+    }
+
+    @ZenMethod
     public SubItem setTooltip(IItemInformation func) {
         this.INFO = func;
         return this;
     }
 
     @ZenMethod
-    public SubItem setTooltip(String[] string) {
+    public SubItem setTooltip(String... string) {
         this.INFO = (stack, world, isAdvanced) -> string;
         return this;
     }
@@ -415,8 +417,8 @@ public class SubItem {
     }
 
     @ZenMethod
-    public SubItem setEffect(boolean value) {
-        this.EFFECT = stack -> value;
+    public SubItem setEffect() {
+        this.EFFECT = stack -> true;
         return this;
     }
 

@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import crafttweaker.annotations.ZenRegister;
 import crafttweaker.api.block.IBlockStateMatcher;
 import crafttweaker.api.block.IMaterial;
+import crafttweaker.api.item.IItemStack;
 import crafttweaker.api.minecraft.CraftTweakerMC;
 import crafttweaker.api.util.IAxisAlignedBB;
 import crafttweaker.api.world.IBlockPos;
@@ -52,10 +53,7 @@ import surreal.contentcreator.util.CTUtil;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 @SuppressWarnings({"deprecation", "unused"})
 
@@ -116,6 +114,7 @@ public class BlockBase extends Block {
     private IBlockBeaconMultiplierFunc BEACONMULTIPLIER = null;
     private IBlockStateViewFunc VIEW = null;
     private IBlockStateBooleanFunc STICKY = null;
+    private IBlockDropsFunc DROPS = null;
 
     // Item Functions
     public IItemUnlocalizedNameFunc ITEMUNLOCNAME = null;
@@ -304,7 +303,7 @@ public class BlockBase extends Block {
 
     @Override
     public boolean onBlockActivated(@Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull IBlockState state, @Nonnull EntityPlayer playerIn, @Nonnull EnumHand hand, @Nonnull EnumFacing facing, float hitX, float hitY, float hitZ) {
-        return ACTIVATED != null ? ACTIVATED.onBlockActivated(CraftTweakerMC.getIWorld(worldIn), CraftTweakerMC.getIBlockPos(pos), CraftTweakerMC.getBlockState(state), CraftTweakerMC.getIPlayer(playerIn), CraftTweakerMC.getIItemStackMutable(playerIn.getHeldItem(hand)), CraftTweakerMC.getIFacing(facing), hitX, hitY, hitZ) : super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ);
+        return ACTIVATED != null ? ACTIVATED.onBlockActivated(CraftTweakerMC.getIWorld(worldIn), CraftTweakerMC.getIBlockPos(pos), CraftTweakerMC.getBlockState(state), CraftTweakerMC.getIPlayer(playerIn), CTUtil.getHandEquipment(hand), CraftTweakerMC.getIFacing(facing), hitX, hitY, hitZ) : super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ);
     }
 
     @Override
@@ -483,6 +482,12 @@ public class BlockBase extends Block {
     public boolean canConnectRedstone(@Nonnull IBlockState state, @Nonnull IBlockAccess world, @Nonnull BlockPos pos, @Nullable EnumFacing side) {
         if (CONNECTREDSTONE != null) return CONNECTREDSTONE.canConnectRedstone(CraftTweakerMC.getBlockState(state), CTUtil.getIBlockAccess(world), CraftTweakerMC.getIBlockPos(pos), CraftTweakerMC.getIFacing(side));
         else return super.canConnectRedstone(state, world, pos, side);
+    }
+
+    @Override
+    public void getDrops(@Nonnull NonNullList<ItemStack> drops, @Nonnull IBlockAccess world, @Nonnull BlockPos pos, @Nonnull IBlockState state, int fortune) {
+        if (this.DROPS != null) Collections.addAll(drops, CraftTweakerMC.getItemStacks(DROPS.getDrops(CTUtil.getIBlockAccess(world), CraftTweakerMC.getIBlockPos(pos), CraftTweakerMC.getBlockState(state), fortune)));
+        else super.getDrops(drops, world, pos, state, fortune);
     }
 
     // MAYBE...
@@ -1106,6 +1111,18 @@ public class BlockBase extends Block {
         if (chance == 0) chance = 1F;
         this.dropBlockAsItemWithChance(w, bp, state, chance, fortune);
         w.setBlockToAir(bp);
+    }
+
+    @ZenMethod
+    public BlockBase setDrops(IBlockDropsFunc func) {
+        this.DROPS = func;
+        return this;
+    }
+
+    @ZenMethod
+    public BlockBase setDrops(IItemStack[] drops) {
+        this.DROPS = (world, pos, state, fortune) -> drops;
+        return this;
     }
 
     // edit canPlace to make this work!
