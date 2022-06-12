@@ -115,6 +115,8 @@ public class BlockBase extends Block {
     private IBlockStateViewFunc VIEW = null;
     private IBlockStateBooleanFunc STICKY = null;
     private IBlockDropsFunc DROPS = null;
+    private IBlockCollisionBox COLLISIONBOXLIST = null;
+    private IBlockBoundingBox BOUNDINGBOX = null;
 
     // Item Functions
     public IItemUnlocalizedNameFunc ITEMUNLOCNAME = null;
@@ -228,15 +230,19 @@ public class BlockBase extends Block {
 
     @Override
     public void addCollisionBoxToList(@Nonnull IBlockState state, @Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull AxisAlignedBB entityBox, @Nonnull List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
-        if (COLLISION_BOXES == null) {
-            super.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn, isActualState);
-        } else COLLISION_BOXES.forEach(aabb -> addCollisionBoxToList(pos, entityBox, collidingBoxes, aabb));
+        if (COLLISIONBOXLIST != null) {
+            for (IAxisAlignedBB aabb : COLLISIONBOXLIST.getCollisionBoxList(CraftTweakerMC.getIWorld(worldIn), CraftTweakerMC.getIBlockPos(pos), CraftTweakerMC.getBlockState(state), CraftTweakerMC.getIAxisAlignedBB(entityBox), CraftTweakerMC.getIEntity(entityIn), isActualState)) {
+                addCollisionBoxToList(pos, entityBox, collidingBoxes, CraftTweakerMC.getAxisAlignedBB(aabb));
+            }
+        } else if (BOUNDINGBOX != null) addCollisionBoxToList(pos, entityBox, collidingBoxes, CraftTweakerMC.getAxisAlignedBB(BOUNDINGBOX.getBoundingBox(CTUtil.getIBlockAccess(worldIn), CraftTweakerMC.getIBlockPos(pos), CraftTweakerMC.getBlockState(state))));
+        else if (COLLISION_BOXES != null) COLLISION_BOXES.forEach(aabb -> addCollisionBoxToList(pos, entityBox, collidingBoxes, aabb));
+        else super.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn, isActualState);
     }
 
     @Nonnull
     @Override
     public AxisAlignedBB getBoundingBox(@Nonnull IBlockState state, @Nonnull IBlockAccess source, @Nonnull BlockPos pos) {
-        return SELECTED_BOX != null ? SELECTED_BOX : super.getBoundingBox(state, source, pos);
+        return BOUNDINGBOX != null ? CraftTweakerMC.getAxisAlignedBB(BOUNDINGBOX.getBoundingBox(CTUtil.getIBlockAccess(source), CraftTweakerMC.getIBlockPos(pos), CraftTweakerMC.getBlockState(state))) : SELECTED_BOX != null ? SELECTED_BOX : super.getBoundingBox(state, source, pos);
     }
 
     @Override
@@ -1100,6 +1106,18 @@ public class BlockBase extends Block {
             this.setHarvestLevel(tool, level, state);
         }
 
+        return this;
+    }
+
+    @ZenMethod
+    public BlockBase setCollisionBox(IBlockCollisionBox func) {
+        this.COLLISIONBOXLIST = func;
+        return this;
+    }
+
+    @ZenMethod
+    public BlockBase setBoundingBox(IBlockBoundingBox func) {
+        this.BOUNDINGBOX = func;
         return this;
     }
 
