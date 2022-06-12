@@ -10,6 +10,7 @@ import stanhebben.zenscript.annotations.ZenExpansion;
 import stanhebben.zenscript.annotations.ZenMethod;
 import surreal.contentcreator.util.CTUtil;
 
+@SuppressWarnings("unused")
 @ZenRegister
 @ZenExpansion("crafttweaker.entity.IEntityLivingBase")
 public class IEntityLivingBaseExpansion {

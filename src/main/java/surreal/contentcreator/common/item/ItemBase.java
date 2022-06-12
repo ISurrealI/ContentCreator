@@ -1,8 +1,10 @@
 package surreal.contentcreator.common.item;
 
+import com.google.common.collect.Multimap;
 import crafttweaker.CraftTweakerAPI;
 import crafttweaker.annotations.ZenRegister;
 import crafttweaker.api.entity.IEntityItem;
+import crafttweaker.api.item.IItemStack;
 import crafttweaker.api.minecraft.CraftTweakerMC;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.block.state.IBlockState;
@@ -14,6 +16,8 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.passive.EntityWolf;
 import net.minecraft.entity.player.EntityPlayer;
@@ -442,6 +446,39 @@ public class ItemBase extends Item implements IEdible {
         else return super.hitEntity(stack, target, attacker);
     }
 
+    @Override
+    public boolean onBlockDestroyed(@Nonnull ItemStack stack, @Nonnull World worldIn, @Nonnull IBlockState state, @Nonnull BlockPos pos, @Nonnull EntityLivingBase entityLiving) {
+        SubItem subItem = get(stack);
+        return subItem.DESTROYBLOCK != null ? subItem.DESTROYBLOCK.onBlockDestroyed(CraftTweakerMC.getIWorld(worldIn), CraftTweakerMC.getIItemStackMutable(stack), CraftTweakerMC.getBlockState(state), CraftTweakerMC.getIBlockPos(pos), CraftTweakerMC.getIEntityLivingBase(entityLiving)) : super.onBlockDestroyed(stack, worldIn, state, pos, entityLiving);
+    }
+
+    @Override
+    public void onCreated(@Nonnull ItemStack stack, @Nonnull World worldIn, @Nonnull EntityPlayer playerIn) {
+        SubItem subItem = get(stack);
+        if (subItem.CREATED != null) subItem.CREATED.onCreated(CraftTweakerMC.getIItemStackMutable(stack), CraftTweakerMC.getIWorld(worldIn), CraftTweakerMC.getIPlayer(playerIn));
+        else super.onCreated(stack, worldIn, playerIn);
+    }
+
+    @Nonnull
+    @Override
+    public Multimap<String, AttributeModifier> getAttributeModifiers(@Nonnull EntityEquipmentSlot slot, @Nonnull ItemStack stack) {
+        SubItem subItem = get(stack);
+        Multimap<String, AttributeModifier> mm = super.getAttributeModifiers(slot, stack);
+
+        if (subItem.ATTACKDAMAGE != null) mm.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Tool modifier", subItem.ATTACKDAMAGE.getValue(CraftTweakerMC.getIEntityEquipmentSlot(slot)), 0));
+        if (subItem.ATTACKSPEED != null) mm.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Tool modifier", subItem.ATTACKDAMAGE.getValue(CraftTweakerMC.getIEntityEquipmentSlot(slot)), 0));
+        return mm;
+    }
+
+    @Override
+    public boolean isDamaged(@Nonnull ItemStack stack) {
+        SubItem subItem = get(stack);
+        IItemStack iStack = CraftTweakerMC.getIItemStack(stack);
+
+        if (subItem.MAXDAMAGE != null && subItem.ITEMDAMAGE != null) return subItem.ITEMDAMAGE.getInt(iStack) > 0;
+        else return super.isDamaged(stack);
+    }
+
     public int getHealAmount(ItemStack stack) {
         SubItem subItem = get(stack);
         if (subItem.HEALAMOUNT != null) return subItem.HEALAMOUNT.getInt(CraftTweakerMC.getIItemStack(stack));
@@ -476,6 +513,25 @@ public class ItemBase extends Item implements IEdible {
     public void ACCompatability(ItemStack stack, EntityPlayer player) {
         FoodValues values = getFoodValues(stack);
         player.getFoodStats().addStats(values.hunger, values.saturationModifier);
+    }
+
+    @Nonnull
+    @Override
+    public String getHighlightTip(@Nonnull ItemStack item, @Nonnull String displayName) {
+        SubItem subItem = get(item);
+        if (subItem.HIGHLIGHTTIP != null) {
+            String tip = subItem.HIGHLIGHTTIP.getHighlightTip(CraftTweakerMC.getIItemStack(item), displayName);
+            if (tip != null) return tip;
+        }
+
+        return super.getHighlightTip(item, displayName);
+    }
+
+    @Override
+    public boolean onDroppedByPlayer(@Nonnull ItemStack item, @Nonnull EntityPlayer player) {
+        SubItem subItem = get(item);
+        if (subItem.PLAYERDROP != null) return subItem.PLAYERDROP.onDroppedByPlayer(CraftTweakerMC.getIItemStackMutable(item), CraftTweakerMC.getIPlayer(player));
+        else return super.onDroppedByPlayer(item, player);
     }
 
     // MAYBE ???

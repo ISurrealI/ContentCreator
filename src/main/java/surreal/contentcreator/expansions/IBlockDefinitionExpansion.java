@@ -12,7 +12,7 @@ import net.minecraft.util.math.BlockPos;
 import stanhebben.zenscript.annotations.ZenExpansion;
 import stanhebben.zenscript.annotations.ZenMethod;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "deprecation"})
 @ZenRegister
 @ZenExpansion("crafttweaker.block.IBlockDefinition")
 public class IBlockDefinitionExpansion {

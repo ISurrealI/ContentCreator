@@ -1,17 +1,38 @@
 package surreal.contentcreator.common.item;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import crafttweaker.annotations.ZenRegister;
 import crafttweaker.api.entity.IEntity;
 import crafttweaker.api.entity.IEntityDefinition;
 import crafttweaker.api.item.IItemStack;
+import crafttweaker.api.minecraft.CraftTweakerMC;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockSnow;
+import net.minecraft.block.BlockSnowBlock;
+import net.minecraft.block.BlockWeb;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.SoundEvents;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import stanhebben.zenscript.annotations.Optional;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
 import surreal.contentcreator.ModValues;
 import surreal.contentcreator.functions.item.*;
+import surreal.contentcreator.util.CTUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -68,6 +89,13 @@ public class SubItem {
     public IItemInteractionEntityFunc ENTITYINTERACTION = null;
     public IItemColorFunc COLOR = null;
     public IItemInformation INFO = null;
+    public IItemBlockDestroy DESTROYBLOCK = null;
+    public IItemHighlightTip HIGHLIGHTTIP = null;
+    public IItemPlayerDrop PLAYERDROP = null;
+
+    // Tool
+    public IItemAttributeModifier ATTACKDAMAGE = null;
+    public IItemAttributeModifier ATTACKSPEED = null;
 
     // Food
     public IItemIntStackFunc HEALAMOUNT = null;
@@ -232,17 +260,156 @@ public class SubItem {
         return this;
     }
 
+    // Reequip animation happens even though shouldCauseReequipAnimation is changed, right clicking on creative sets damage of item to 1 even though it shouldn't :face_with_raised_eyebrow:
+    // If you know how to fix i would appreciate if you help me to fix it
     @ZenMethod
-    public SubItem setDamage(int maxDamage) {
-        this.CREATED = (stack, world, player) -> {
-            ItemStack st = (ItemStack) stack.getInternal();
-            if (!st.hasTagCompound()) st.setTagCompound(new NBTTagCompound());
-            st.getTagCompound().setInteger("damage", 0);
-        };
+    public SubItem setTool(String tool, int level, int maxDamage, float efficiency, @Optional int enchantability, @Optional double attackDamage, @Optional double attackSpeed) {
         this.MAXDAMAGE = stack -> maxDamage;
-        this.ITEMDAMAGE = stack -> ((ItemStack) stack.getInternal()).getTagCompound().getInteger("damage");
-        this.SETDAMAGE = (stack, damageToSet) -> ((ItemStack) stack.getInternal()).getTagCompound().setInteger("damage", damageToSet);
+        this.ITEMDAMAGE = stack -> {
+            ItemStack internal = ((ItemStack) stack.getInternal());
+            NBTTagCompound tag = internal.getTagCompound();
+            if (tag != null) return tag.getInteger("Damage");
+            else {
+                internal.setTagCompound(new NBTTagCompound());
+                return 0;
+            }
+        };
+        this.SETDAMAGE = (stack, damageToSet) -> {
+            ItemStack internal = ((ItemStack) stack.getInternal());
+            NBTTagCompound tag = internal.getTagCompound();
+            if (tag != null) tag.setInteger("Damage", damageToSet);
+            else internal.setTagCompound(new NBTTagCompound());
+        };
+        this.addToolClass(tool, level);
 
+        this.DESTROYBLOCK = (world, stack, state, pos, entity) -> {
+            if (!world.isRemote() && state.getBlockHardness(world, pos) != 0D) stack.damageItem(1, entity);
+            return true;
+        };
+        this.ENTITYHIT = (stack, entity, attacker) -> {
+            stack.damageItem(2, attacker);
+            return true;
+        };
+        this.DESTROYSPEED = (stack, state) -> {
+            for (String classes : stack.getToolClasses()) {
+                if (state.getBlock().getDefinition().isToolEffective(classes, state)) return efficiency;
+            }
+            return 1.0F;
+        };
+        this.HARVESTBLOCK = (state, stack) -> {
+            IBlockState st = (IBlockState) state.getInternal();
+            Block block = st.getBlock();
+
+            if (tool.equalsIgnoreCase("shovel")) return block instanceof BlockSnow || block instanceof BlockSnowBlock;
+            return st.getBlock().getHarvestTool(st) == null || (st.getBlock().getHarvestLevel(st) <= level && st.getBlock().getHarvestTool(st).equalsIgnoreCase(tool));
+        };
+
+        this.ITEMUSE = (pl, world, position, hand, face, hitX, hitY, hitZ) -> {
+            EntityPlayer player = (EntityPlayer) pl.getInternal();
+            ItemStack itemstack = player.getHeldItem(CTUtil.getHand(hand));
+
+            BlockPos pos = (BlockPos) position.getInternal();
+            EnumFacing facing = (EnumFacing) face.getInternal();
+
+            World worldIn = (World) world.getInternal();
+
+            if (!player.canPlayerEdit(pos.offset(facing), facing, itemstack)) return "FAIL";
+            else {
+                IBlockState iblockstate = worldIn.getBlockState(pos);
+                Block block = iblockstate.getBlock();
+
+                if (facing != EnumFacing.DOWN && worldIn.isAirBlock(pos.up())) {
+                    if (tool.equalsIgnoreCase("shovel") && block == Blocks.GRASS) {
+                        worldIn.playSound(player, pos, SoundEvents.ITEM_SHOVEL_FLATTEN, SoundCategory.BLOCKS, 1.0F, 1.0F);
+
+                        if (!worldIn.isRemote) {
+                            worldIn.setBlockState(pos, Blocks.GRASS_PATH.getDefaultState(), 11);
+                        }
+
+                        return "SUCCESS";
+                    }
+                    if (tool.equalsIgnoreCase("hoe") && block == Blocks.GRASS || block == Blocks.GRASS_PATH || block == Blocks.DIRT) {
+                        worldIn.playSound(player, pos, SoundEvents.ITEM_HOE_TILL, SoundCategory.BLOCKS, 1.0F, 1.0F);
+
+                        if (!worldIn.isRemote) {
+                            if (block.getMetaFromState(iblockstate) != 1) worldIn.setBlockState(pos, Blocks.FARMLAND.getDefaultState(), 11);
+                            else worldIn.setBlockState(pos, Blocks.DIRT.getDefaultState(), 11);
+                        }
+
+                        return "SUCCESS";
+                    }
+                }
+            }
+
+            return "PASS";
+        };
+        this.REEQUIP = (oldStack, newStack, slotChanged) -> {
+            ItemStack stack = ((ItemStack) oldStack.getInternal());
+            ItemStack stack1 = ((ItemStack) newStack.getInternal());
+            return stack.getItem() != stack1.getItem() || stack.getMetadata() != stack1.getMetadata();
+        };
+
+        return this.setAttackDamage(attackDamage).setAttackSpeed(attackSpeed).setEnchantability(enchantability);
+    }
+
+    @ZenMethod
+    public SubItem setSword(int maxDamage, double attackDamage, @Optional double attackSpeed, @Optional int enchantability) {
+        if (attackSpeed == 0F) attackSpeed = -2.4000000953674316D;
+        this.ENTITYHIT = (stack, entity, attacker) -> {
+            stack.damageItem(1, attacker);
+            return true;
+        };
+        this.DESTROYBLOCK = (world, stack, state, pos, entity) -> {
+            if (!world.isRemote() && state.getBlockHardness(world, pos) != 0D) stack.damageItem(2, entity);
+            return true;
+        };
+        this.DESTROYSPEED = (stack, st) -> {
+            IBlockState state = (IBlockState) st.getInternal();
+            Block block = state.getBlock();
+            if (block instanceof BlockWeb) return 15F;
+            else {
+                Material material = state.getMaterial();
+                return material != Material.PLANTS && material != Material.VINE && material != Material.CORAL && material != Material.LEAVES && material != Material.GOURD ? 1.0F : 1.5F;
+            }
+        };
+        this.DESTROYCREATIVE = (world, pos, stack, player) -> false;
+
+        return this.setAttackDamage(attackDamage).setAttackSpeed(attackSpeed).setEnchantability(enchantability);
+    }
+
+    @ZenMethod
+    public SubItem setAttackDamage(IItemAttributeModifier func) {
+        this.ATTACKDAMAGE = func;
+        return this;
+    }
+
+    @ZenMethod
+    public SubItem setAttackSpeed(IItemAttributeModifier func) {
+        this.ATTACKSPEED = func;
+        return this;
+    }
+
+    @ZenMethod
+    public SubItem setAttackDamage(double value) {
+        if (value > 0D) {
+            this.ATTACKDAMAGE = slot -> {
+                EntityEquipmentSlot equipmentSlot = (EntityEquipmentSlot) slot.getInternal();
+                if (equipmentSlot == EntityEquipmentSlot.MAINHAND) return value;
+                return 0D;
+            };
+        }
+        return this;
+    }
+
+    @ZenMethod
+    public SubItem setAttackSpeed(double value) {
+        if (value > 0D) {
+            this.ATTACKSPEED = slot -> {
+                EntityEquipmentSlot equipmentSlot = (EntityEquipmentSlot) slot.getInternal();
+                if (equipmentSlot == EntityEquipmentSlot.MAINHAND) return value;
+                return 0D;
+            };
+        }
         return this;
     }
 
@@ -530,9 +697,27 @@ public class SubItem {
         return this;
     }
 
-    @ZenClass
+    @ZenMethod
     public SubItem setColor(IItemColorFunc func) {
         this.COLOR = func;
+        return this;
+    }
+
+    @ZenMethod
+    public SubItem setBlockDestroyed(IItemBlockDestroy func) {
+        this.DESTROYBLOCK = func;
+        return this;
+    }
+
+    @ZenMethod
+    public SubItem setHighlightTip(IItemHighlightTip func) {
+        this.HIGHLIGHTTIP = func;
+        return this;
+    }
+
+    @ZenMethod
+    public SubItem setPlayerDropped(IItemPlayerDrop func) {
+        this.PLAYERDROP = func;
         return this;
     }
 }
