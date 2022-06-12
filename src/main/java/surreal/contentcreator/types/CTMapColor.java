@@ -6,6 +6,8 @@ import net.minecraft.item.EnumDyeColor;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
 
+@SuppressWarnings("unused")
+
 @ZenRegister
 @ZenClass("contentcreator.block.MapColor")
 public class CTMapColor {

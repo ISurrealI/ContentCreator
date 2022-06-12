@@ -4,7 +4,6 @@ import com.google.gson.JsonObject;
 import net.minecraft.block.SoundType;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fluids.Fluid;
-import org.apache.commons.lang3.text.WordUtils;
 import surreal.contentcreator.ModValues;
 import surreal.contentcreator.common.fluid.FluidBase;
 
@@ -17,9 +16,9 @@ import static net.minecraft.block.SoundType.*;
 import static net.minecraft.block.SoundType.SLIME;
 
 public class GeneralUtil {
-    public static String toUppercase(String name) {
+/*    public static String toUppercase(String name) {
         return WordUtils.capitalizeFully(name, '_').replaceAll("_", " ");
-    }
+    }*/
 
     public static void generateFiles() {
         File file = new File(Minecraft.getMinecraft().mcDataDir, "resources/" + ModValues.MODID + "/textures/items");

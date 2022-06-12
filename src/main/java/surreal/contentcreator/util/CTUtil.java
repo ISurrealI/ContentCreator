@@ -28,16 +28,6 @@ import surreal.contentcreator.proxy.CommonProxy;
 import java.util.*;
 
 public class CTUtil {
-    public static Enchantment[] getEnchantments(IEnchantmentDefinition[] enchantments) {
-        Enchantment[] enchs = new Enchantment[enchantments.length];
-
-        for (int i = 0; i < enchantments.length; i++) {
-            enchs[i] = (Enchantment) enchantments[i].getInternal();
-        }
-
-        return enchs;
-    }
-
     public static List<ItemStack> getStacks(Item item) {
         NonNullList<ItemStack> list = NonNullList.create();
 

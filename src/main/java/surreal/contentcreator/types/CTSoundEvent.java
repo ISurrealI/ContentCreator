@@ -8,6 +8,8 @@ import stanhebben.zenscript.annotations.ZenMethod;
 import surreal.contentcreator.ModValues;
 import surreal.contentcreator.proxy.CommonProxy;
 
+@SuppressWarnings("unused")
+
 @ZenRegister
 @ZenClass("contentcreator.sound.SoundEvent")
 public class CTSoundEvent {

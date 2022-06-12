@@ -7,6 +7,8 @@ import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
 import surreal.contentcreator.util.GeneralUtil;
 
+@SuppressWarnings("unused")
+
 @ZenRegister
 @ZenClass("contentcreator.block.SoundType")
 public class CTSoundType {
