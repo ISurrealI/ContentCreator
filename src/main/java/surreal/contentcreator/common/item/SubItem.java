@@ -1,10 +1,6 @@
 package surreal.contentcreator.common.item;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
 import crafttweaker.annotations.ZenRegister;
-import crafttweaker.api.entity.IEntity;
-import crafttweaker.api.entity.IEntityDefinition;
 import crafttweaker.api.item.IItemStack;
 import crafttweaker.api.minecraft.CraftTweakerMC;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -14,14 +10,12 @@ import net.minecraft.block.BlockSnowBlock;
 import net.minecraft.block.BlockWeb;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
@@ -33,6 +27,7 @@ import stanhebben.zenscript.annotations.ZenMethod;
 import surreal.contentcreator.ModValues;
 import surreal.contentcreator.functions.item.*;
 import surreal.contentcreator.util.CTUtil;
+import surreal.contentcreator.util.GeneralUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -129,6 +124,17 @@ public class SubItem {
     }
 
     @ZenMethod
+    public SubItem setModelLocation(String model) {
+        StringBuilder builder = new StringBuilder(ModValues.MODID);
+        builder.append(':');
+        if (model.contains(":")) model = model.replace(":", ".");
+        builder.append(model.trim().toLowerCase());
+        if (!model.contains("#")) builder.append("#inventory");
+        this.modelLocation = builder.toString();
+        return this;
+    }
+
+    @ZenMethod
     public SubItem setUnlocalizedName(String unlocName) {
         this.UNLOCNAME = stack -> unlocName;
         return this;
@@ -152,9 +158,9 @@ public class SubItem {
         return this;
     }
 
-    @ZenMethod
-    public SubItem setXpRepair(IItemFloatStackFunc func) {
-        this.XPREPAIR = func;
+        @ZenMethod
+        public SubItem setXpRepair(IItemFloatStackFunc func) {
+            this.XPREPAIR = func;
         return this;
     }
 
@@ -191,6 +197,12 @@ public class SubItem {
     @ZenMethod
     public SubItem setContainerItem(IItemStack stack) {
         this.CONTAINERITEM = stack1 -> stack;
+        return this;
+    }
+
+    @ZenMethod
+    public SubItem setContainerItem(String stack) {
+        this.CONTAINERITEM = stack1 -> CraftTweakerMC.getIItemStack(GeneralUtil.getStackFromString(stack));
         return this;
     }
 
@@ -237,7 +249,7 @@ public class SubItem {
     }
 
     @ZenMethod
-    public SubItem setDurabilityPercent(IItemDoubleStackFunc func) {
+    public SubItem setDurabilityDisplay(IItemDoubleStackFunc func) {
         this.DURABILITYDISPLAY = func;
         return this;
     }
@@ -280,7 +292,6 @@ public class SubItem {
             if (tag != null) tag.setInteger("Damage", damageToSet);
             else internal.setTagCompound(new NBTTagCompound());
         };
-        this.addToolClass(tool, level);
 
         this.DESTROYBLOCK = (world, stack, state, pos, entity) -> {
             if (!world.isRemote() && state.getBlockHardness(world, pos) != 0D) stack.damageItem(1, entity);
@@ -349,11 +360,11 @@ public class SubItem {
             return stack.getItem() != stack1.getItem() || stack.getMetadata() != stack1.getMetadata();
         };
 
-        return this.setAttackDamage(attackDamage).setAttackSpeed(attackSpeed).setEnchantability(enchantability);
+        return this.addToolClass(tool, level).setAttackDamage(attackDamage).setAttackSpeed(attackSpeed).setEnchantability(enchantability);
     }
 
     @ZenMethod
-    public SubItem setSword(int maxDamage, double attackDamage, @Optional double attackSpeed, @Optional int enchantability) {
+    public SubItem setWeapon(int maxDamage, double attackDamage, @Optional double attackSpeed, @Optional int enchantability) {
         if (attackSpeed == 0F) attackSpeed = -2.4000000953674316D;
         this.ENTITYHIT = (stack, entity, attacker) -> {
             stack.damageItem(1, attacker);
@@ -420,7 +431,7 @@ public class SubItem {
     }
 
     @ZenMethod
-    public SubItem setNoDestroyInCreative() {
+    public SubItem disableCreativeBlockDestroy() {
         this.DESTROYCREATIVE = (world, pos, stack, player) -> false;
         return this;
     }
@@ -463,7 +474,7 @@ public class SubItem {
     }
 
     @ZenMethod
-    public SubItem setContinueUsing(IItemContinueUsingFunc func) {
+    public SubItem continueUsing(IItemContinueUsingFunc func) {
         this.CONTINUEUSING = func;
         return this;
     }
@@ -541,7 +552,7 @@ public class SubItem {
     }
 
     @ZenMethod
-    public SubItem setDisableShield() {
+    public SubItem canDisableShield() {
         this.DISABLESHIED = (stack, shield, entity, attacker) -> true;
         return this;
     }
@@ -616,17 +627,6 @@ public class SubItem {
     @ZenMethod
     public SubItem setRightClick(IItemRightClick func) {
         this.RIGHTCLICK = func;
-        return this;
-    }
-
-    @ZenMethod
-    public SubItem setModelLocation(String model) {
-        StringBuilder builder = new StringBuilder(ModValues.MODID);
-        builder.append(':');
-        if (model.contains(":")) model = model.replace(":", ".");
-        builder.append(model.trim().toLowerCase());
-        if (!model.contains("#")) builder.append("#inventory");
-        this.modelLocation = builder.toString();
         return this;
     }
 

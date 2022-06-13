@@ -3,6 +3,12 @@ package surreal.contentcreator.util;
 import com.google.gson.JsonObject;
 import net.minecraft.block.SoundType;
 import net.minecraft.client.Minecraft;
+import net.minecraft.init.Items;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.JsonToNBT;
+import net.minecraft.nbt.NBTException;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fluids.Fluid;
 import surreal.contentcreator.ModValues;
 import surreal.contentcreator.common.fluid.FluidBase;
@@ -93,5 +99,30 @@ public class GeneralUtil {
             case "slime": return SLIME;
             default: return null;
         }
+    }
+
+    public static ItemStack getStackFromString(String str) {
+        boolean hasNBT = str.contains("#");
+
+        String a = hasNBT ? str.split("#")[1] : null;
+        if (hasNBT) str = str.split("#")[0];
+
+        String[] stackSplit = str.split(":");
+
+        Item item = Item.getByNameOrId(stackSplit[0] + ":" + stackSplit[1]);
+        if (item == null || item == Items.AIR) return ItemStack.EMPTY;
+
+        int meta = stackSplit.length > 2 ? Integer.parseInt(stackSplit[2]) : 0;
+
+        ItemStack stack = new ItemStack(item, 1, meta);
+
+        if (a != null) {
+            try {
+                NBTTagCompound tag = JsonToNBT.getTagFromJson(a);
+                stack.setTagCompound(tag);
+            } catch (NBTException ignored) {}
+        }
+
+        return stack;
     }
 }

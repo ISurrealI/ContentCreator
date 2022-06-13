@@ -4,6 +4,7 @@ import com.google.common.collect.Multimap;
 import crafttweaker.CraftTweakerAPI;
 import crafttweaker.annotations.ZenRegister;
 import crafttweaker.api.entity.IEntityItem;
+import crafttweaker.api.item.IItemDefinition;
 import crafttweaker.api.item.IItemStack;
 import crafttweaker.api.minecraft.CraftTweakerMC;
 import net.minecraft.advancements.CriteriaTriggers;
@@ -72,6 +73,20 @@ public class ItemBase extends Item implements IEdible {
     }
 
     @ZenMethod
+    public static ItemBase getItem(IItemStack st) {
+        ItemStack stack = CraftTweakerMC.getItemStack(st);
+        if (stack.getItem() instanceof ItemBase) return (ItemBase) stack.getItem();
+        return null;
+    }
+
+    @ZenMethod
+    public static ItemBase getItem(IItemDefinition definition) {
+        Item item = CraftTweakerMC.getItem(definition);
+        if (item instanceof ItemBase) return (ItemBase) item;
+        return null;
+    }
+
+    @ZenMethod
     public ItemBase add(SubItem... items) {
         Collections.addAll(SUBITEMS, items);
         return this;
@@ -84,8 +99,26 @@ public class ItemBase extends Item implements IEdible {
     }
 
     @ZenMethod
+    public SubItem getItem(int meta) {
+        if (meta >= 0 && meta < SUBITEMS.size())
+            return SUBITEMS.get(meta);
+
+        return sub(meta);
+    }
+
+    @ZenMethod
+    public boolean hasItem(int meta) {
+        return meta >= 0 && meta < SUBITEMS.size();
+    }
+
+    @ZenMethod
     public static SubItem sub(int meta) {
         return new SubItem(meta);
+    }
+
+    @ZenMethod
+    public static SubItem sub() {
+        return new SubItem(0);
     }
 
     @ZenMethod
