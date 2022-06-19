@@ -80,8 +80,10 @@ public class ClientProxy extends CommonProxy {
     }
 
     private static void registerFluidMapper(Fluid fluid) {
-        CustomFluidStateMapper mapper = new CustomFluidStateMapper(fluid.getName());
-        ModelLoader.setCustomStateMapper(fluid.getBlock(), mapper);
+        if (fluid.getBlock() != null) {
+            CustomFluidStateMapper mapper = new CustomFluidStateMapper(fluid.getName());
+            ModelLoader.setCustomStateMapper(fluid.getBlock(), mapper);
+        }
     }
 
     @SubscribeEvent
