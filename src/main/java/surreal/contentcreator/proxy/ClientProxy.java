@@ -23,7 +23,9 @@ import surreal.contentcreator.client.fluid.CustomFluidStateMapper;
 import surreal.contentcreator.common.block.BlockBase;
 import surreal.contentcreator.common.item.ItemBase;
 import surreal.contentcreator.common.item.ItemBlockBase;
+import surreal.contentcreator.common.item.ItemMaterial;
 import surreal.contentcreator.functions.item.IItemColorFunc;
+import surreal.contentcreator.types.CTMaterial;
 import surreal.contentcreator.util.CTUtil;
 import surreal.contentcreator.util.GeneralUtil;
 
@@ -45,10 +47,19 @@ public class ClientProxy extends CommonProxy {
         return 0xFFFFFF;
     };
 
-    public static final IItemColor ITEMBLOCKCOLOR = (ItemStack stack, int index) -> {
+    public static final IItemColor ITEMBLOCKCOLOR = (stack, index) -> {
         if (stack.getItem() instanceof ItemBlockBase) {
             ItemBlockBase item = (ItemBlockBase) stack.getItem();
             if (item.blockBase.COLOR != null) return item.blockBase.COLOR.colorMultiplier(CraftTweakerMC.getBlockState(item.blockBase.getStateFromMeta(stack.getMetadata())), index);
+        }
+
+        return 0xFFFFFF;
+    };
+
+    public static final IItemColor MATERIALITEMCOLOR = (stack, tintIndex) -> {
+        if (stack.getItem() instanceof ItemMaterial) {
+            ItemMaterial item = (ItemMaterial) stack.getItem();
+            return item.MATERIAL_ARRAY[stack.getMetadata()].color;
         }
 
         return 0xFFFFFF;
@@ -107,6 +118,13 @@ public class ClientProxy extends CommonProxy {
             }
         }
 
+        for (ItemMaterial item : CommonProxy.MAT_ITEMS) {
+            for (int i = 0; i < CTUtil.getStacks(item).size(); i++) {
+                CTMaterial material = item.MATERIAL_ARRAY[i];
+                ModelLoader.setCustomModelResourceLocation(item, i, new ModelResourceLocation(item.getModelLocation(material), "inventory"));
+            }
+        }
+
         if (ModConfig.CONFIG.generateFiles) {
             GeneralUtil.generateFiles();
             GeneralUtil.generateFluidFiles(FLUIDS);
@@ -128,6 +146,10 @@ public class ClientProxy extends CommonProxy {
 
         for (Item item : CommonProxy.ITEMBLOCKS) {
             event.getItemColors().registerItemColorHandler(ITEMBLOCKCOLOR, item);
+        }
+
+        for (Item item : CommonProxy.MAT_ITEMS) {
+            event.getItemColors().registerItemColorHandler(MATERIALITEMCOLOR, item);
         }
     }
 }
