@@ -14,8 +14,10 @@ import surreal.contentcreator.proxy.ClientProxy;
 import surreal.contentcreator.proxy.CommonProxy;
 import surreal.contentcreator.types.CTSoundEvent;
 import surreal.contentcreator.util.CTUtil;
+import surreal.contentcreator.util.GeneralUtil;
 
 import javax.annotation.Nullable;
+import java.awt.*;
 import java.util.List;
 
 @SuppressWarnings("unused")
@@ -24,6 +26,9 @@ import java.util.List;
 @ZenClass("contentcreator.fluid.Fluid")
 public class FluidBase extends Fluid {
     private static final List<ResourceLocation> TEXTURES = ClientProxy.fluidTextures;
+
+    public static final ResourceLocation STILL_DEFAULT = new ResourceLocation(ModValues.MODID, "blocks/fluids/base_still");
+    public static final ResourceLocation FLOW_DEFAULT = new ResourceLocation(ModValues.MODID, "blocks/fluids/base_flow");
 
     public boolean bucket = false;
     public Material blockMaterial = null;
@@ -37,8 +42,8 @@ public class FluidBase extends Fluid {
     @ZenMethod
     public static FluidBase create(String name, @Optional String stillLocation, @Optional String flowingLocation, @Optional String overlay) {
         ResourceLocation ol = overlay != null ? new ResourceLocation(ModValues.MODID, "blocks/fluids/" + overlay) : null;
-        ResourceLocation still = stillLocation != null ? new ResourceLocation(ModValues.MODID, "blocks/fluids/" + stillLocation) : new ResourceLocation(ModValues.MODID, "blocks/fluids/base_still");
-        ResourceLocation flow = flowingLocation != null ? new ResourceLocation(ModValues.MODID, "blocks/fluids/" + flowingLocation) : new ResourceLocation(ModValues.MODID, "blocks/fluids/base_flow");
+        ResourceLocation still = stillLocation != null ? new ResourceLocation(ModValues.MODID, "blocks/fluids/" + stillLocation) : STILL_DEFAULT;
+        ResourceLocation flow = flowingLocation != null ? new ResourceLocation(ModValues.MODID, "blocks/fluids/" + flowingLocation) : FLOW_DEFAULT;
 
         if (ol != null && !TEXTURES.contains(ol)) TEXTURES.add(ol);
         if (!TEXTURES.contains(still)) TEXTURES.add(still);
@@ -106,6 +111,6 @@ public class FluidBase extends Fluid {
 
     @ZenMethod("setColor")
     public FluidBase setCol(int color) {
-        return (FluidBase) super.setColor(color);
+        return (FluidBase) super.setColor(GeneralUtil.getColorFromInt(color));
     }
 }

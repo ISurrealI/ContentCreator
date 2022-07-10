@@ -18,6 +18,7 @@ import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import surreal.contentcreator.ModConfig;
 import surreal.contentcreator.client.fluid.CustomFluidStateMapper;
 import surreal.contentcreator.common.block.BlockBase;
@@ -30,11 +31,11 @@ import surreal.contentcreator.util.GeneralUtil;
 import java.util.ArrayList;
 import java.util.List;
 
+@SideOnly(Side.CLIENT)
 @Mod.EventBusSubscriber(value = Side.CLIENT)
 public class ClientProxy extends CommonProxy {
     public static final List<String> texturesToRegister = new ArrayList<>();
     public static final List<ResourceLocation> fluidTextures = new ArrayList<>();
-
     public static final IItemColor ITEMCOLOR = (stack, tintIndex) -> {
         if (stack.getItem() instanceof ItemBase) {
             ItemBase item = (ItemBase) stack.getItem();
@@ -109,8 +110,9 @@ public class ClientProxy extends CommonProxy {
 
         if (ModConfig.CONFIG.generateFiles) {
             GeneralUtil.generateFiles();
-            GeneralUtil.generateFluidFiles(FLUIDS);
         }
+
+        GeneralUtil.generateFluidFiles(FLUIDS);
     }
 
     @SubscribeEvent

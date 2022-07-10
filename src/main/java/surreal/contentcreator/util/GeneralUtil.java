@@ -13,6 +13,7 @@ import net.minecraftforge.fluids.Fluid;
 import surreal.contentcreator.ModValues;
 import surreal.contentcreator.common.fluid.FluidBase;
 
+import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -124,5 +125,9 @@ public class GeneralUtil {
         }
 
         return stack;
+    }
+
+    public static Color getColorFromInt(int i) {
+        return new Color((i >> 16) & 0xFF, (i >> 8) & 0xFF, i & 0xFF);
     }
 }
