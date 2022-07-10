@@ -29,8 +29,10 @@ public class ItemMaterial extends Item {
     @Nonnull
     @Override
     public String getItemStackDisplayName(ItemStack stack) {
-        CTMaterial material = MATERIAL_ARRAY[stack.getMetadata()];
-        return I18n.format(ModValues.MODID + "." + this.part.name, GeneralUtil.toUppercase(material.name));
+        if (stack.getMetadata() < MATERIAL_ARRAY.length) {
+            CTMaterial material = MATERIAL_ARRAY[stack.getMetadata()];
+            return I18n.format(ModValues.MODID + "." + this.part.name, GeneralUtil.toUppercase(material.name));
+        } else return super.getItemStackDisplayName(stack);
     }
 
     @Override
@@ -45,5 +47,9 @@ public class ItemMaterial extends Item {
 
     public String getModelLocation(CTMaterial material) {
         return ModValues.MODID + ":part/" + material.textureType + "/" + this.part.texName;
+    }
+
+    public String getOreDict(CTMaterial material) {
+        return part.name + GeneralUtil.toUppercase(material.name);
     }
 }
