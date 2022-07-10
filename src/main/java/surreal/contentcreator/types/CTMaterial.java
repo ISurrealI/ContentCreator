@@ -33,6 +33,16 @@ public class CTMaterial {
     }
 
     @ZenMethod
+    public CTMaterial types(String... type) {
+        for (String str : type) {
+            CTPart part = CTPart.PARTS.containsKey(str) ? CTPart.PARTS.get(str) : new CTPart(str, str);
+            part.materials.add(this);
+        }
+
+        return this;
+    }
+
+    @ZenMethod
     public CTMaterial setTexture(String type) {
         this.textureType = type;
         return this;

@@ -9,6 +9,7 @@ import net.minecraft.util.SoundEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -19,6 +20,7 @@ import surreal.contentcreator.common.fluid.FluidBlockBase;
 import surreal.contentcreator.common.item.ItemBase;
 import surreal.contentcreator.common.item.ItemMaterial;
 import surreal.contentcreator.common.item.SubItem;
+import surreal.contentcreator.types.CTMaterial;
 import surreal.contentcreator.types.CTPart;
 import surreal.contentcreator.util.CTUtil;
 import surreal.contentcreator.ModValues;
@@ -41,6 +43,11 @@ public class CommonProxy {
     public void preInit(FMLPreInitializationEvent event) {
         registerFluids();
         registerMatItems();
+    }
+
+    public void postInit(FMLPostInitializationEvent event) {
+        registerMatOres();
+        if (ItemBracketHandler.itemMap == null) ItemBracketHandler.itemMap = CTUtil.getMap();
     }
 
     private static void registerFluids() {
@@ -98,8 +105,11 @@ public class CommonProxy {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    public static void registerRecipesLowest(RegistryEvent.Register<IRecipe> event) {
-        if (ItemBracketHandler.itemMap == null) ItemBracketHandler.itemMap = CTUtil.getMap();
+    private static void registerMatOres() {
+        for (ItemMaterial item : MAT_ITEMS) {
+            for (int i = 0; i < item.MATERIAL_ARRAY.length; i++) {
+                OreDictionary.registerOre(item.getOreDict(item.MATERIAL_ARRAY[i]), new ItemStack(item, 1, i));
+            }
+        }
     }
 }
