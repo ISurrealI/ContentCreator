@@ -9,7 +9,6 @@ import net.minecraft.util.SoundEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -18,7 +17,9 @@ import net.minecraftforge.registries.IForgeRegistry;
 import surreal.contentcreator.common.fluid.FluidBase;
 import surreal.contentcreator.common.fluid.FluidBlockBase;
 import surreal.contentcreator.common.item.ItemBase;
+import surreal.contentcreator.common.item.ItemMaterial;
 import surreal.contentcreator.common.item.SubItem;
+import surreal.contentcreator.types.CTPart;
 import surreal.contentcreator.util.CTUtil;
 import surreal.contentcreator.ModValues;
 import surreal.contentcreator.brackets.ItemBracketHandler;
@@ -29,6 +30,7 @@ import java.util.List;
 @Mod.EventBusSubscriber(modid = ModValues.MODID)
 public class CommonProxy {
     public static List<ItemBase> ITEMS = new ArrayList<>();
+    public static List<ItemMaterial> MAT_ITEMS = new ArrayList<>();
     public static List<ItemBlock> ITEMBLOCKS = new ArrayList<>();
 
     public static List<Block> BLOCKS = new ArrayList<>();
@@ -36,15 +38,9 @@ public class CommonProxy {
 
     public static List<SoundEvent> SOUNDS = new ArrayList<>();
 
-    private static void init() {
-    }
-
     public void preInit(FMLPreInitializationEvent event) {
         registerFluids();
-        init();
-    }
-
-    public void init(FMLInitializationEvent event) {
+        registerMatItems();
     }
 
     private static void registerFluids() {
@@ -60,6 +56,13 @@ public class CommonProxy {
         }
     }
 
+    private static void registerMatItems() {
+        for (CTPart part : CTPart.PARTS.values()) {
+            ItemMaterial item = new ItemMaterial(part);
+            MAT_ITEMS.add(item);
+        }
+    }
+
     @SubscribeEvent
     public static void registerSounds(RegistryEvent.Register<SoundEvent> event) {
         IForgeRegistry<SoundEvent> registry = event.getRegistry();
@@ -71,6 +74,7 @@ public class CommonProxy {
         IForgeRegistry<Item> registry = event.getRegistry();
         ITEMS.forEach(registry::register);
         ITEMBLOCKS.forEach(registry::register);
+        MAT_ITEMS.forEach(registry::register);
     }
 
     @SubscribeEvent
