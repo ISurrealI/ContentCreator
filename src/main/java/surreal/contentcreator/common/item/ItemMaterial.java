@@ -31,7 +31,7 @@ public class ItemMaterial extends Item {
     public String getItemStackDisplayName(ItemStack stack) {
         if (stack.getMetadata() < MATERIAL_ARRAY.length) {
             CTMaterial material = MATERIAL_ARRAY[stack.getMetadata()];
-            return I18n.format(ModValues.MODID + "." + this.part.name, GeneralUtil.toUppercase(material.name));
+            return I18n.format(ModValues.MODID + "." + this.part.name, GeneralUtil.toUppercase(material.name, " "));
         } else return super.getItemStackDisplayName(stack);
     }
 
@@ -50,6 +50,6 @@ public class ItemMaterial extends Item {
     }
 
     public String getOreDict(CTMaterial material) {
-        return part.name + GeneralUtil.toUppercase(material.name);
+        return part.name + GeneralUtil.toUppercase(material.name, "");
     }
 }

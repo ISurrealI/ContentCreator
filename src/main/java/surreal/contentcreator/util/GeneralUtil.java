@@ -24,8 +24,8 @@ import static net.minecraft.block.SoundType.*;
 import static net.minecraft.block.SoundType.SLIME;
 
 public class GeneralUtil {
-    public static String toUppercase(String name) {
-        return WordUtils.capitalizeFully(name, '_').replaceAll("_", " ");
+    public static String toUppercase(String name, String replacement) {
+        return WordUtils.capitalizeFully(name, '_').replaceAll("_", replacement);
     }
 
     public static void generateFiles() {
