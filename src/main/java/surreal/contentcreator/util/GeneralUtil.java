@@ -1,5 +1,6 @@
 package surreal.contentcreator.util;
 
+import com.google.common.base.CaseFormat;
 import com.google.gson.JsonObject;
 import net.minecraft.block.SoundType;
 import net.minecraft.client.Minecraft;
@@ -24,8 +25,8 @@ import static net.minecraft.block.SoundType.*;
 import static net.minecraft.block.SoundType.SLIME;
 
 public class GeneralUtil {
-    public static String toUppercase(String name, String replacement) {
-        return WordUtils.capitalizeFully(name, '_').replaceAll("_", replacement);
+    public static String toUppercase(CaseFormat from, CaseFormat to, String str) {
+        return from.to(to, str);
     }
 
     public static void generateFiles() {

@@ -60,7 +60,7 @@ public class ClientProxy extends CommonProxy {
     public static final IItemColor MATERIALITEMCOLOR = (stack, tintIndex) -> {
         if (stack.getItem() instanceof ItemMaterial) {
             ItemMaterial item = (ItemMaterial) stack.getItem();
-            return item.MATERIAL_ARRAY[stack.getMetadata()].color;
+            return item.MATERIALS.get(stack.getMetadata()).color;
         }
 
         return 0xFFFFFF;
@@ -119,10 +119,9 @@ public class ClientProxy extends CommonProxy {
             }
         }
 
-        for (ItemMaterial item : CommonProxy.MAT_ITEMS) {
-            for (int i = 0; i < CTUtil.getStacks(item).size(); i++) {
-                CTMaterial material = item.MATERIAL_ARRAY[i];
-                ModelLoader.setCustomModelResourceLocation(item, i, new ModelResourceLocation(item.getModelLocation(material), "inventory"));
+        for (ItemMaterial item : CommonProxy.MAT_ITEMS.values()) {
+            for (CTMaterial material : item.part.getMaterials()) {
+                ModelLoader.setCustomModelResourceLocation(item, material.id, new ModelResourceLocation(item.getModelLocation(material), "inventory"));
             }
         }
 
@@ -150,7 +149,7 @@ public class ClientProxy extends CommonProxy {
             event.getItemColors().registerItemColorHandler(ITEMBLOCKCOLOR, item);
         }
 
-        for (Item item : CommonProxy.MAT_ITEMS) {
+        for (Item item : CommonProxy.MAT_ITEMS.values()) {
             event.getItemColors().registerItemColorHandler(MATERIALITEMCOLOR, item);
         }
     }

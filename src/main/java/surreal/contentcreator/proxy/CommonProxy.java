@@ -11,7 +11,6 @@ import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.registries.IForgeRegistry;
@@ -21,18 +20,20 @@ import surreal.contentcreator.common.item.ItemBase;
 import surreal.contentcreator.common.item.ItemMaterial;
 import surreal.contentcreator.common.item.SubItem;
 import surreal.contentcreator.types.CTMaterial;
-import surreal.contentcreator.types.CTPart;
+import surreal.contentcreator.types.parts.PartItem;
 import surreal.contentcreator.util.CTUtil;
 import surreal.contentcreator.ModValues;
 import surreal.contentcreator.brackets.ItemBracketHandler;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Mod.EventBusSubscriber(modid = ModValues.MODID)
 public class CommonProxy {
     public static List<ItemBase> ITEMS = new ArrayList<>();
-    public static List<ItemMaterial> MAT_ITEMS = new ArrayList<>();
+    public static Map<String, ItemMaterial> MAT_ITEMS = new HashMap<>();
     public static List<ItemBlock> ITEMBLOCKS = new ArrayList<>();
 
     public static List<Block> BLOCKS = new ArrayList<>();
@@ -64,9 +65,9 @@ public class CommonProxy {
     }
 
     private static void registerMatItems() {
-        for (CTPart part : CTPart.PARTS.values()) {
+        for (PartItem part : PartItem.PARTS.values()) {
             ItemMaterial item = new ItemMaterial(part);
-            MAT_ITEMS.add(item);
+            MAT_ITEMS.put(part.name, item);
         }
     }
 
@@ -81,7 +82,7 @@ public class CommonProxy {
         IForgeRegistry<Item> registry = event.getRegistry();
         ITEMS.forEach(registry::register);
         ITEMBLOCKS.forEach(registry::register);
-        MAT_ITEMS.forEach(registry::register);
+        MAT_ITEMS.values().forEach(registry::register);
     }
 
     @SubscribeEvent
@@ -106,9 +107,12 @@ public class CommonProxy {
     }
 
     private static void registerMatOres() {
-        for (ItemMaterial item : MAT_ITEMS) {
-            for (int i = 0; i < item.MATERIAL_ARRAY.length; i++) {
-                OreDictionary.registerOre(item.getOreDict(item.MATERIAL_ARRAY[i]), new ItemStack(item, 1, i));
+        for (ItemMaterial item : MAT_ITEMS.values()) {
+            for (CTMaterial material : item.part.getMaterials()) {
+                ItemStack stack = new ItemStack(item, 1, material.id);
+                for (String ore : material.ores) {
+                    OreDictionary.registerOre(item.part.oreName + ore, stack);
+                }
             }
         }
     }

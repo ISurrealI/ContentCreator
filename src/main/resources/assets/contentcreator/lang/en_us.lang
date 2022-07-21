@@ -1,8 +1,8 @@
-contentcreator.dust=%s Dust
-contentcreator.dust_tiny=Tiny %s Dust
-contentcreator.gear=%s Gear
-contentcreator.ingot=%s Ingot
-contentcreator.nugget=%s Nugget
-contentcreator.plate=%s Plate
-contentcreator.plate_dense=Dense %s Plate
-contentcreator.stick=%s Rod
+part.dust=%s Dust
+part.dust_tiny=Tiny %s Dust
+part.gear=%s Gear
+part.ingot=%s Ingot
+part.nugget=%s Nugget
+part.plate=%s Plate
+part.plate_dense=Dense %s Plate
+part.stick=%s Rod
