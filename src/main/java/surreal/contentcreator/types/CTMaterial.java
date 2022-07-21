@@ -13,11 +13,13 @@ import stanhebben.zenscript.annotations.Optional;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenGetter;
 import stanhebben.zenscript.annotations.ZenMethod;
+import stanhebben.zenscript.value.IAny;
 import surreal.contentcreator.common.item.ItemMaterial;
 import surreal.contentcreator.proxy.CommonProxy;
 import surreal.contentcreator.types.parts.PartItem;
 import surreal.contentcreator.util.GeneralUtil;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @SuppressWarnings("unused")
@@ -33,6 +35,8 @@ public class CTMaterial {
     public String[] ores;
 
     public String textureType = "default";
+
+    public Map<String, Object> properties;
 
     private CTMaterial(int id, String name, int color) {
         this.id = id;
@@ -65,6 +69,70 @@ public class CTMaterial {
     public CTMaterial addItem(String type, @Optional String oreName) {
         PartItem part = PartItem.PARTS.containsKey(type) ? PartItem.PARTS.get(type) : new PartItem(type, (oreName == null ? type : oreName));
         part.materials.add(this);
+        return this;
+    }
+
+    @ZenMethod
+    public CTMaterial addProperty(String name, boolean prop) {
+        if (properties == null) properties = new HashMap<>();
+        if (!properties.containsKey(name)) properties.put(name, prop);
+        else properties.replace(name, prop);
+        return this;
+    }
+
+    @ZenMethod
+    public CTMaterial addProperty(String name, byte prop) {
+        if (properties == null) properties = new HashMap<>();
+        if (!properties.containsKey(name)) properties.put(name, prop);
+        else properties.replace(name, prop);
+        return this;
+    }
+
+    @ZenMethod
+    public CTMaterial addProperty(String name, short prop) {
+        if (properties == null) properties = new HashMap<>();
+        if (!properties.containsKey(name)) properties.put(name, prop);
+        else properties.replace(name, prop);
+        return this;
+    }
+
+    @ZenMethod
+    public CTMaterial addProperty(String name, int prop) {
+        if (properties == null) properties = new HashMap<>();
+        if (!properties.containsKey(name)) properties.put(name, prop);
+        else properties.replace(name, prop);
+        return this;
+    }
+
+    @ZenMethod
+    public CTMaterial addProperty(String name, long prop) {
+        if (properties == null) properties = new HashMap<>();
+        if (!properties.containsKey(name)) properties.put(name, prop);
+        else properties.replace(name, prop);
+        return this;
+    }
+
+    @ZenMethod
+    public CTMaterial addProperty(String name, float prop) {
+        if (properties == null) properties = new HashMap<>();
+        if (!properties.containsKey(name)) properties.put(name, prop);
+        else properties.replace(name, prop);
+        return this;
+    }
+
+    @ZenMethod
+    public CTMaterial addProperty(String name, double prop) {
+        if (properties == null) properties = new HashMap<>();
+        if (!properties.containsKey(name)) properties.put(name, prop);
+        else properties.replace(name, prop);
+        return this;
+    }
+
+    @ZenMethod
+    public CTMaterial addProperty(String name, String prop) {
+        if (properties == null) properties = new HashMap<>();
+        if (!properties.containsKey(name)) properties.put(name, prop);
+        else properties.replace(name, prop);
         return this;
     }
 
@@ -102,6 +170,78 @@ public class CTMaterial {
         }
 
         return new MCItemStack(new ItemStack(item, 1, this.id));
+    }
+
+    @ZenMethod
+    public boolean getBool(String name) {
+        if (properties != null && properties.containsKey(name) && properties.get(name) instanceof Boolean) {
+            return (boolean) properties.get(name);
+        }
+
+        return false;
+    }
+
+    @ZenMethod
+    public byte getByte(String name) {
+        if (properties != null && properties.containsKey(name) && properties.get(name) instanceof Byte) {
+            return (byte) properties.get(name);
+        }
+
+        return 0;
+    }
+
+    @ZenMethod
+    public short getShort(String name) {
+        if (properties != null && properties.containsKey(name) && properties.get(name) instanceof Short) {
+            return (short) properties.get(name);
+        }
+
+        return 0;
+    }
+
+    @ZenMethod
+    public int getInt(String name) {
+        if (properties != null && properties.containsKey(name) && properties.get(name) instanceof Integer) {
+            return (int) properties.get(name);
+        }
+
+        return 0;
+    }
+
+    @ZenMethod
+    public float getFloat(String name) {
+        if (properties != null && properties.containsKey(name) && properties.get(name) instanceof Float) {
+            return (float) properties.get(name);
+        }
+
+        return 0;
+    }
+
+    @ZenMethod
+    public double getDouble(String name) {
+        if (properties != null && properties.containsKey(name) && properties.get(name) instanceof Double) {
+            return (double) properties.get(name);
+        }
+
+        return 0;
+    }
+
+    @ZenMethod
+    public long getLong(String name) {
+        if (properties != null && properties.containsKey(name) && properties.get(name) instanceof Long) {
+            return (long) properties.get(name);
+        }
+
+        return 0;
+    }
+
+    @ZenMethod
+    public String getString(String name) {
+        if (properties != null && properties.containsKey(name) && properties.get(name) instanceof String) {
+            return (String) properties.get(name);
+        }
+
+        return null;
     }
 
     @ZenMethod
