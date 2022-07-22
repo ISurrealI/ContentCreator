@@ -1,18 +1,22 @@
 package surreal.contentcreator.common.item;
 
-import com.google.common.base.CaseFormat;
 import com.google.common.collect.Maps;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
+import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import surreal.contentcreator.ModValues;
 import surreal.contentcreator.types.CTMaterial;
 import surreal.contentcreator.types.parts.PartItem;
-import surreal.contentcreator.util.GeneralUtil;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Map;
 
 public class ItemMaterial extends Item {
@@ -50,6 +54,12 @@ public class ItemMaterial extends Item {
         }
     }
 
+    @SideOnly(Side.CLIENT)
+    @Override
+    public void addInformation(@Nonnull ItemStack stack, @Nullable World worldIn, @Nonnull List<String> tooltip, @Nonnull ITooltipFlag flagIn) {
+        CTMaterial material = this.MATERIALS.get(stack.getMetadata());
+        tooltip.addAll(material.tooltips);
+    }
 
     public String getModelLocation(CTMaterial material) {
         return ModValues.MODID + ":part/" + material.textureType + "/" + this.part.name;

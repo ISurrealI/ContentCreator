@@ -19,8 +19,7 @@ import surreal.contentcreator.proxy.CommonProxy;
 import surreal.contentcreator.types.parts.PartItem;
 import surreal.contentcreator.util.GeneralUtil;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @SuppressWarnings("unused")
 
@@ -36,6 +35,7 @@ public class CTMaterial {
 
     public String textureType = "default";
 
+    public List<String> tooltips;
     public Map<String, Object> properties;
 
     private CTMaterial(int id, String name, int color) {
@@ -62,6 +62,13 @@ public class CTMaterial {
     @ZenMethod
     public CTMaterial setOres(String... ores) {
         this.ores = ores;
+        return this;
+    }
+
+    @ZenMethod
+    public CTMaterial addTooltip(String... tooltips) {
+        if (this.tooltips == null) this.tooltips = new ArrayList<>();
+        Collections.addAll(this.tooltips, tooltips);
         return this;
     }
 

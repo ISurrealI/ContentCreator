@@ -7,6 +7,9 @@ import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
 import surreal.contentcreator.util.GeneralUtil;
 
+import static net.minecraft.block.SoundType.*;
+import static net.minecraft.block.SoundType.SLIME;
+
 @SuppressWarnings("unused")
 
 @ZenRegister
@@ -55,7 +58,26 @@ public class CTSoundType {
 
     @ZenMethod("get")
     public static CTSoundType getCT(String name) {
-        return GeneralUtil.get(name) != null ? new CTSoundType(GeneralUtil.get(name)) : null;
+        SoundType type = get(name);
+        return type != null ? new CTSoundType(type) : null;
+    }
+
+    public static SoundType get(String name) {
+        switch (name) {
+            case "wood": return WOOD;
+            case "ground": return GROUND;
+            case "plant": return PLANT;
+            case "stone": return STONE;
+            case "metal": return METAL;
+            case "glass": return GLASS;
+            case "cloth": return CLOTH;
+            case "sand": return SAND;
+            case "snow": return SNOW;
+            case "ladder": return LADDER;
+            case "anvil": return ANVIL;
+            case "slime": return SLIME;
+            default: return null;
+        }
     }
 
     public SoundType getInternal() {

@@ -86,24 +86,6 @@ public class GeneralUtil {
         }
     }
 
-    public static SoundType get(String name) {
-        switch (name) {
-            case "wood": return WOOD;
-            case "ground": return GROUND;
-            case "plant": return PLANT;
-            case "stone": return STONE;
-            case "metal": return METAL;
-            case "glass": return GLASS;
-            case "cloth": return CLOTH;
-            case "sand": return SAND;
-            case "snow": return SNOW;
-            case "ladder": return LADDER;
-            case "anvil": return ANVIL;
-            case "slime": return SLIME;
-            default: return null;
-        }
-    }
-
     public static ItemStack getStackFromString(String str) {
         boolean hasNBT = str.contains("#");
 
