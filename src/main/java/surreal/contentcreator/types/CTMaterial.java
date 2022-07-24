@@ -27,6 +27,7 @@ import java.util.*;
 @ZenClass("contentcreator.material.Material")
 public class CTMaterial {
     public static final Map<String, CTMaterial> MATERIALS = Maps.newHashMap();
+    public static int ID = 0;
 
     public int id;
     public String name;
@@ -254,12 +255,19 @@ public class CTMaterial {
     @ZenMethod
     public static CTMaterial get(String name, @Optional int color) {
         CTMaterial material = MATERIALS.get(name);
-        return material == null ? new CTMaterial(MATERIALS.size(), name, (color == 0 ? 0xFFFFFF : color)) : material;
+        if (material == null) {
+            material = new CTMaterial(ID, name, (color == 0 ? 0xFFFFFF : color));
+            ID++;
+        }
+
+        return material;
     }
 
     @ZenMethod
     public static CTMaterial get(int id, String name, @Optional int color) {
         CTMaterial material = MATERIALS.get(name);
-        return material == null ? new CTMaterial(id, name, (color == 0 ? 0xFFFFFF : color)) : material;
+        if (material != null) material.id = id;
+        else material = new CTMaterial(id, name, (color == 0 ? 0xFFFFFF : color));
+        return material;
     }
 }
