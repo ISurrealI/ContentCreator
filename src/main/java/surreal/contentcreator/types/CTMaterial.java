@@ -155,7 +155,7 @@ public class CTMaterial {
 
     @ZenGetter("localizedName")
     public String getLocalizedName() {
-        return I18n.hasKey(this.name) ? I18n.format(this.name) : WordUtils.capitalizeFully(this.name, '_').replace("_", " ");
+        return I18n.hasKey("material." + this.name) ? I18n.format("material." + this.name) : WordUtils.capitalizeFully(this.name, '_').replace("_", " ");
     }
 
     @ZenGetter("name")
