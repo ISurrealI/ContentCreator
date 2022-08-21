@@ -4,10 +4,12 @@ import com.google.common.collect.Maps;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
+import net.minecraftforge.common.IRarity;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import surreal.contentcreator.ModValues;
@@ -59,6 +61,13 @@ public class ItemMaterial extends Item {
     public void addInformation(@Nonnull ItemStack stack, @Nullable World worldIn, @Nonnull List<String> tooltip, @Nonnull ITooltipFlag flagIn) {
         CTMaterial material = this.MATERIALS.get(stack.getMetadata());
         if (material.tooltips != null) tooltip.addAll(material.tooltips);
+    }
+
+    @Nonnull
+    @Override
+    public IRarity getForgeRarity(ItemStack stack) {
+        CTMaterial material = this.MATERIALS.get(stack.getMetadata());
+        return EnumRarity.valueOf(material.rarity.toUpperCase());
     }
 
     public String getModelLocation(CTMaterial material) {

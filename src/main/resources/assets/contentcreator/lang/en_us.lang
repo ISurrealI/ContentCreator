@@ -6,3 +6,6 @@ part.nugget=%s Nugget
 part.plate=%s Plate
 part.plate_dense=Dense %s Plate
 part.stick=%s Rod
+
+temperature.molten=Melting Temperature
+temperature.gas=Evaporation Temperature

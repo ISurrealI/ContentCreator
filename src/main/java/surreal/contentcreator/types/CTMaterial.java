@@ -4,16 +4,23 @@ import com.google.common.base.CaseFormat;
 import com.google.common.collect.Maps;
 import crafttweaker.CraftTweakerAPI;
 import crafttweaker.annotations.ZenRegister;
+import crafttweaker.api.block.IMaterial;
 import crafttweaker.api.item.IItemStack;
+import crafttweaker.api.liquid.ILiquidStack;
+import crafttweaker.api.minecraft.CraftTweakerMC;
 import crafttweaker.mc1120.item.MCItemStack;
+import net.minecraft.block.material.Material;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fluids.FluidStack;
 import org.apache.commons.lang3.text.WordUtils;
 import stanhebben.zenscript.annotations.Optional;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenGetter;
 import stanhebben.zenscript.annotations.ZenMethod;
-import stanhebben.zenscript.value.IAny;
+import surreal.contentcreator.common.fluid.FluidBase;
 import surreal.contentcreator.common.item.ItemMaterial;
 import surreal.contentcreator.proxy.CommonProxy;
 import surreal.contentcreator.types.parts.PartItem;
@@ -36,8 +43,12 @@ public class CTMaterial {
 
     public String textureType = "default";
 
+    public String rarity = "common";
+
     public List<String> tooltips;
     public Map<String, Object> properties;
+
+    public Map<String, FluidBase> fluids = new HashMap<>();
 
     private CTMaterial(int id, String name, int color) {
         this.id = id;
@@ -63,6 +74,12 @@ public class CTMaterial {
     @ZenMethod
     public CTMaterial setOres(String... ores) {
         this.ores = ores;
+        return this;
+    }
+
+    @ZenMethod
+    public CTMaterial setRarity(String rarity) {
+        this.rarity = rarity;
         return this;
     }
 
@@ -154,6 +171,32 @@ public class CTMaterial {
         return this;
     }
 
+    @ZenMethod
+    public CTMaterial addFluid(String name, int temperature, @Optional int density, @Optional int viscosity, @Optional boolean block, @Optional String overlay) {
+        FluidBase fluid = FluidBase.create(name + "_" + this.name, name + "_still", name + "_flow", overlay).setCol(this.color).setRare(this.rarity).addBucket();
+
+        this.fluids.put(name, fluid);
+        fluid.setDen(density).setVis(viscosity);
+        if (block) {
+            IMaterial material = temperature >= FluidRegistry.LAVA.getTemperature() ? CraftTweakerMC.getIMaterial(Material.LAVA) : CraftTweakerMC.getIMaterial(Material.WATER);
+            fluid.addBlock(material);
+        }
+        addProperty("temperature." + name, temperature);
+
+        return this;
+    }
+
+    @ZenMethod
+    public CTMaterial addPropertyInfo() {
+        if (tooltips == null) tooltips = new ArrayList<>();
+        if (properties.size() > 0) {
+            for (Map.Entry<String, Object> prop : properties.entrySet()) {
+                tooltips.add(I18n.format(prop.getKey()) + ": " + prop.getValue());
+            }
+        } else CraftTweakerAPI.logWarning("There's no property to add to info. Skipping!");
+        return this;
+    }
+
     @ZenGetter("localizedName")
     public String getLocalizedName() {
         return I18n.hasKey("material." + this.name) ? I18n.format("material." + this.name) : WordUtils.capitalizeFully(this.name, '_').replace("_", " ");
@@ -170,7 +213,7 @@ public class CTMaterial {
     }
 
     @ZenMethod
-    public IItemStack getPart(String part) {
+    public IItemStack getItem(String part) {
         ItemMaterial item = CommonProxy.MAT_ITEMS.get(part);
         if (item == null) {
             CraftTweakerAPI.logError("The part " + part + " doesn't exist. Returning null!");
@@ -178,6 +221,13 @@ public class CTMaterial {
         }
 
         return new MCItemStack(new ItemStack(item, 1, this.id));
+    }
+
+    @ZenMethod
+    public ILiquidStack getFluid(String part) {
+        Fluid fluid = this.fluids.get(part);
+        if (fluid != null) return CraftTweakerMC.getILiquidStack(new FluidStack(fluid, 1));
+        return null;
     }
 
     @ZenMethod

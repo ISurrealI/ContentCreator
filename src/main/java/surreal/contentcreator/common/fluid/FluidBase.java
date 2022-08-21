@@ -95,8 +95,8 @@ public class FluidBase extends Fluid {
     }
 
     @ZenMethod("setRarity")
-    public Fluid setRare(String rarity) {
-        return super.setRarity(CTUtil.getRarity(rarity));
+    public FluidBase setRare(String rarity) {
+        return (FluidBase) super.setRarity(CTUtil.getRarity(rarity));
     }
 
     @ZenMethod("setFillSound")
