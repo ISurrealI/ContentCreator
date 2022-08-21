@@ -166,7 +166,6 @@ public class BlockBase extends Block {
         BlockBase base = new BlockBase(CraftTweakerMC.getMaterial(material));
         base.setRegistryName(ModValues.MODID, name).setUnlocalizedName(ModValues.MODID + "." + name);
         CommonProxy.BLOCKS.add(base);
-        CommonProxy.ITEMBLOCKS.add(new ItemBlockBase(base));
         if (FACING != null || INT != null) clear();
 
         return base;
@@ -876,13 +875,18 @@ public class BlockBase extends Block {
 
     @ZenMethod
     public BlockBase setSubItems() {
-        this.SUBITEM = state -> true;
-        return this;
+        return setSubItems(state -> true);
+    }
+
+    @ZenMethod
+    public BlockBase setSubItem() {
+        return setSubItems(state -> this.getMetaFromState(CraftTweakerMC.getBlockState(state)) == 0);
     }
 
     @ZenMethod
     public BlockBase setSubItems(IBlockSubItemFunc func) {
         this.SUBITEM = func;
+        CommonProxy.ITEMBLOCKS.add(new ItemBlockBase(this));
         return this;
     }
 

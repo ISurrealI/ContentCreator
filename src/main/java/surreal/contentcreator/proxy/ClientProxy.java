@@ -125,6 +125,7 @@ public class ClientProxy extends CommonProxy {
 
         GeneralUtil.generateItemFiles(ITEMS);
         GeneralUtil.generateMatItems(MAT_ITEMS.values());
+        GeneralUtil.generateBlocks(BLOCKS);
         GeneralUtil.generateFiles();
         GeneralUtil.generateFluidFiles(FLUIDS);
     }

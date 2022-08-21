@@ -1,7 +1,9 @@
 package surreal.contentcreator.util;
 
 import com.google.common.base.CaseFormat;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.init.Items;
@@ -13,6 +15,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fluids.Fluid;
 import org.apache.commons.lang3.text.WordUtils;
 import surreal.contentcreator.ModValues;
+import surreal.contentcreator.common.block.BlockBase;
 import surreal.contentcreator.common.fluid.FluidBase;
 import surreal.contentcreator.common.item.ItemBase;
 import surreal.contentcreator.common.item.ItemMaterial;
@@ -154,6 +157,43 @@ public class GeneralUtil {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+            }
+        }
+    }
+
+    public static void generateBlocks(Collection<Block> blocks) {
+        for (Block block : blocks) {
+            JsonObject object = new JsonObject();
+            object.addProperty("forge_marker", 1);
+
+            JsonObject defaults = new JsonObject();
+            defaults.addProperty("transform", "forge:default-block");
+            defaults.addProperty("model", "cube_all");
+
+            JsonObject textures = new JsonObject();
+            textures.addProperty("all", ModValues.MODID + ":blocks/" + block.getRegistryName().getResourcePath());
+            defaults.add("textures", textures);
+
+            object.add("defaults", defaults);
+
+            JsonObject variants = new JsonObject();
+            JsonArray mongus = new JsonArray();
+            mongus.add(new JsonObject());
+            variants.add("normal", mongus);
+            variants.add("inventory", mongus);
+            object.add("variants", variants);
+
+            try {
+                File f = new File(Minecraft.getMinecraft().mcDataDir, "resources/" + ModValues.MODID + "/blockstates/" + block.getRegistryName().getResourcePath() + ".json");
+
+                if (!f.exists()) {
+                    FileWriter file = new FileWriter(f);
+                    file.write(object.toString());
+                    file.close();
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }

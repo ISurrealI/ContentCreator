@@ -36,6 +36,7 @@ public class CommonProxy {
     public static Map<String, ItemMaterial> MAT_ITEMS = new HashMap<>();
     public static List<ItemBlock> ITEMBLOCKS = new ArrayList<>();
 
+    public static List<Block> FLUID_BLOCKS = new ArrayList<>();
     public static List<Block> BLOCKS = new ArrayList<>();
     public static List<FluidBase> FLUIDS = new ArrayList<>();
 
@@ -58,7 +59,7 @@ public class CommonProxy {
             if (fluid.blockMaterial != null) {
                 FluidBlockBase fluidBlock = new FluidBlockBase(fluid, fluid.blockMaterial);
 
-                BLOCKS.add(fluidBlock);
+                FLUID_BLOCKS.add(fluidBlock);
                 fluid.setBlock(fluidBlock);
             }
         }
@@ -88,6 +89,7 @@ public class CommonProxy {
     @SubscribeEvent
     public static void registerBlocks(RegistryEvent.Register<Block> event) {
         IForgeRegistry<Block> registry = event.getRegistry();
+        FLUID_BLOCKS.forEach(registry::register);
         BLOCKS.forEach(registry::register);
     }
     
