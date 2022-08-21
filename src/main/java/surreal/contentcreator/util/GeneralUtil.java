@@ -15,16 +15,15 @@ import org.apache.commons.lang3.text.WordUtils;
 import surreal.contentcreator.ModValues;
 import surreal.contentcreator.common.fluid.FluidBase;
 import surreal.contentcreator.common.item.ItemBase;
+import surreal.contentcreator.common.item.ItemMaterial;
 import surreal.contentcreator.common.item.SubItem;
+import surreal.contentcreator.types.CTMaterial;
 
 import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.List;
-
-import static net.minecraft.block.SoundType.*;
-import static net.minecraft.block.SoundType.SLIME;
+import java.util.Collection;
 
 public class GeneralUtil {
     public static String toUppercase(CaseFormat from, CaseFormat to, String str) {
@@ -52,7 +51,7 @@ public class GeneralUtil {
         }
     }
 
-    public static void generateItemFiles(List<ItemBase> list) {
+    public static void generateItemFiles(Collection<ItemBase> list) {
         File blockstates = new File(Minecraft.getMinecraft().mcDataDir, "resources/" + ModValues.MODID + "/blockstates/item");
         File models = new File(Minecraft.getMinecraft().mcDataDir, "resources/" + ModValues.MODID + "/models/item");
 
@@ -129,7 +128,37 @@ public class GeneralUtil {
         }
     }
 
-    public static void generateFluidFiles(List<FluidBase> list) {
+    public static void generateMatItems(Collection<ItemMaterial> items) {
+        for (ItemMaterial item : items) {
+            for (CTMaterial material : item.MATERIALS.values()) {
+                String model = item.getModelLocation(material).split(":")[1];
+                String texture = "items/" + model;
+
+                File f = new File(Minecraft.getMinecraft().mcDataDir, "resources/" + ModValues.MODID + "/models/item/" + model + ".json");
+                if (!f.getParentFile().exists()) f.getParentFile().mkdirs();
+
+                JsonObject object = new JsonObject();
+                object.addProperty("parent", "item/generated");
+
+                JsonObject textures = new JsonObject();
+                textures.addProperty("layer0", ModValues.MODID + ":" + texture);
+                object.add("textures", textures);
+
+                try {
+                    if (!f.exists()) {
+                        FileWriter file = new FileWriter(f);
+                        file.write(object.toString());
+                        file.close();
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public static void generateFluidFiles(Collection<FluidBase> list) {
         if (list.size() > 0) {
             JsonObject object = new JsonObject();
             object.addProperty("forge_marker", 1);
