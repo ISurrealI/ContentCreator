@@ -100,8 +100,6 @@ public class SubItem {
 
     // Variables
     public final int meta;
-    public String modelLocation; // like location#type
-
     public Map<ResourceLocation, IItemPropertyFunc> itemProperties = null;
     public Map<String, Integer> toolClasses = null;
     public List<String> oreList = null;
@@ -120,17 +118,6 @@ public class SubItem {
     @ZenMethod
     public SubItem setUnlocalizedName(IItemUnlocalizedNameFunc func) {
         this.UNLOCNAME = func;
-        return this;
-    }
-
-    @ZenMethod
-    public SubItem setModelLocation(String model) {
-        StringBuilder builder = new StringBuilder(ModValues.MODID);
-        builder.append(':');
-        if (model.contains(":")) model = model.replace(":", ".");
-        builder.append(model.trim().toLowerCase());
-        if (!model.contains("#")) builder.append("#inventory");
-        this.modelLocation = builder.toString();
         return this;
     }
 

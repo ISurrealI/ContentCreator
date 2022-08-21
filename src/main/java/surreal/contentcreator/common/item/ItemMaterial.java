@@ -58,7 +58,7 @@ public class ItemMaterial extends Item {
     @Override
     public void addInformation(@Nonnull ItemStack stack, @Nullable World worldIn, @Nonnull List<String> tooltip, @Nonnull ITooltipFlag flagIn) {
         CTMaterial material = this.MATERIALS.get(stack.getMetadata());
-        tooltip.addAll(material.tooltips);
+        if (material.tooltips != null) tooltip.addAll(material.tooltips);
     }
 
     public String getModelLocation(CTMaterial material) {

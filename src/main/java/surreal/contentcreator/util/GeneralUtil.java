@@ -14,6 +14,8 @@ import net.minecraftforge.fluids.Fluid;
 import org.apache.commons.lang3.text.WordUtils;
 import surreal.contentcreator.ModValues;
 import surreal.contentcreator.common.fluid.FluidBase;
+import surreal.contentcreator.common.item.ItemBase;
+import surreal.contentcreator.common.item.SubItem;
 
 import java.awt.*;
 import java.io.File;
@@ -33,6 +35,9 @@ public class GeneralUtil {
         File file = new File(Minecraft.getMinecraft().mcDataDir, "resources/" + ModValues.MODID + "/textures/items");
         if (!file.exists()) file.mkdirs();
 
+        file = new File(file.getParentFile(), "blocks");
+        if (!file.exists()) file.mkdirs();
+
         file = new File(Minecraft.getMinecraft().mcDataDir, "resources/" + ModValues.MODID + "/lang");
         if (!file.exists()) file.mkdirs();
 
@@ -43,6 +48,83 @@ public class GeneralUtil {
                 file.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
+            }
+        }
+    }
+
+    public static void generateItemFiles(List<ItemBase> list) {
+        File blockstates = new File(Minecraft.getMinecraft().mcDataDir, "resources/" + ModValues.MODID + "/blockstates/item");
+        File models = new File(Minecraft.getMinecraft().mcDataDir, "resources/" + ModValues.MODID + "/models/item");
+
+        for (ItemBase item : list) {
+            if (item.modelBlockState) {
+                if (!blockstates.exists()) blockstates.mkdirs();
+
+                JsonObject object = new JsonObject();
+                object.addProperty("forge_marker", 1);
+
+                JsonObject defaults = new JsonObject();
+                defaults.addProperty("model", "builtin/generated");
+                defaults.addProperty("transform", "forge:default-item");
+                object.add("defaults", defaults);
+
+                JsonObject variants = new JsonObject();
+                JsonObject type = new JsonObject();
+                for (SubItem sub : item.SUBITEMS.values()) {
+                    String name = item.getSubName(sub);
+                    if (name == null) name = "" + sub.meta;
+
+                    JsonObject obj = new JsonObject();
+                    JsonObject textures = new JsonObject();
+                    textures.addProperty("layer0", ModValues.MODID + ":items/" + item.getRegistryName().getResourcePath() + "/" + name);
+                    obj.add("textures", textures);
+                    type.add(name, obj);
+                }
+                variants.add("type", type);
+                object.add("variants", variants);
+
+                try {
+                    File f = new File(blockstates, item.getRegistryName().getResourcePath() + ".json");
+
+                    if (!f.exists()) {
+                        FileWriter file = new FileWriter(f);
+                        file.write(object.toString());
+                        file.close();
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                if (!models.exists()) models.mkdirs();
+
+                for (SubItem sub : item.SUBITEMS.values()) {
+                    String name = item.getSubName(sub);
+                    if (name == null) {
+                        if (sub.meta != 0) name = item.getRegistryName().getResourcePath() + "_" + sub.meta;
+                        else name = item.getRegistryName().getResourcePath();
+                    }
+
+                    JsonObject object = new JsonObject();
+                    object.addProperty("parent", "item/generated");
+
+                    JsonObject textures = new JsonObject();
+                    textures.addProperty("layer0", ModValues.MODID + ":items/" + name);
+                    object.add("textures", textures);
+
+                    try {
+                        File f = new File(models, name + ".json");
+
+                        if (!f.exists()) {
+                            FileWriter file = new FileWriter(f);
+                            file.write(object.toString());
+                            file.close();
+                        }
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         }
     }

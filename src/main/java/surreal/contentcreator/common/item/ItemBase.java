@@ -48,10 +48,7 @@ import surreal.contentcreator.util.CTUtil;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @SuppressWarnings("unused")
 
@@ -59,11 +56,11 @@ import java.util.Map;
 @ZenClass("contentcreator.item.Item")
 @Optional.Interface(iface = "squeek.applecore.api.food.IEdible", modid = "applecore")
 public class ItemBase extends Item implements IEdible {
-    public final List<SubItem> SUBITEMS;
+    public final Map<Integer, SubItem> SUBITEMS;
     public boolean modelBlockState = false; // for not needing to mass model files
 
     public ItemBase() {
-        SUBITEMS = new ArrayList<>();
+        SUBITEMS = new HashMap<>();
         this.setCreativeTab(CreativeTabs.SEARCH);
     }
 
@@ -88,7 +85,10 @@ public class ItemBase extends Item implements IEdible {
 
     @ZenMethod
     public ItemBase add(SubItem... items) {
-        Collections.addAll(SUBITEMS, items);
+        for (SubItem sub : items) {
+            SUBITEMS.put(sub.meta, sub);
+        }
+
         return this;
     }
 
@@ -123,9 +123,9 @@ public class ItemBase extends Item implements IEdible {
 
     @ZenMethod
     public void register() {
-        if (SUBITEMS.size() <= 0) SUBITEMS.add(new SubItem(0));
+        if (SUBITEMS.size() <= 0) SUBITEMS.put(0, new SubItem(0));
         else {
-            for (SubItem subItem : SUBITEMS) {
+            for (SubItem subItem : SUBITEMS.values()) {
                 Map<ResourceLocation, IItemPropertyFunc> props = subItem.itemProperties;
                 Map<String, Integer> classes = subItem.toolClasses;
 
@@ -143,15 +143,16 @@ public class ItemBase extends Item implements IEdible {
 
     public String getModelLocation(int meta) {
         SubItem subItem = SUBITEMS.get(meta);
-        String model = subItem.modelLocation;
-        if (model == null) {
-            model = this.getRegistryName().toString();
-            String variant = "" + meta;
-            if (subItem.UNLOCNAME != null) variant = subItem.UNLOCNAME.getUnlocalizedName(CraftTweakerMC.getIItemStack(new ItemStack(this, 1, meta)));
-            model += this.modelBlockState ? "#type=" + variant : (meta == 0 && subItem.UNLOCNAME == null ? "" : "_" + variant) + "#inventory";
-        }
+        String model = !this.modelBlockState ? this.getRegistryName().getResourceDomain() + ":" : this.getRegistryName().getResourceDomain() + ":item/" + this.getRegistryName().getResourcePath();
+        String variant = "" + meta;
+        if (subItem.UNLOCNAME != null) variant = subItem.UNLOCNAME.getUnlocalizedName(CraftTweakerMC.getIItemStack(new ItemStack(this, 1, meta)));
+        model += this.modelBlockState ? "#type=" + variant : (meta == 0 && subItem.UNLOCNAME == null ? this.getRegistryName().getResourcePath() : variant) + "#inventory";
 
         return model;
+    }
+
+    public String getSubName(SubItem subItem) {
+        return subItem.UNLOCNAME != null ? subItem.UNLOCNAME.getUnlocalizedName(CraftTweakerMC.getIItemStack(new ItemStack(this, 1, subItem.meta))) : null;
     }
 
     @Override
