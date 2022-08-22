@@ -25,7 +25,7 @@ import java.util.List;
 @ZenRegister
 @ZenClass("contentcreator.fluid.Fluid")
 public class FluidBase extends Fluid {
-    private static final List<ResourceLocation> TEXTURES = ClientProxy.fluidTextures;
+    protected static final List<ResourceLocation> TEXTURES = ClientProxy.fluidTextures;
 
     public static final ResourceLocation STILL_DEFAULT = new ResourceLocation(ModValues.MODID, "blocks/fluids/base_still");
     public static final ResourceLocation FLOW_DEFAULT = new ResourceLocation(ModValues.MODID, "blocks/fluids/base_flow");

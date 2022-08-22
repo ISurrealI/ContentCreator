@@ -12,6 +12,7 @@ import crafttweaker.mc1120.item.MCItemStack;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
@@ -20,7 +21,9 @@ import stanhebben.zenscript.annotations.Optional;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenGetter;
 import stanhebben.zenscript.annotations.ZenMethod;
+import surreal.contentcreator.ModValues;
 import surreal.contentcreator.common.fluid.FluidBase;
+import surreal.contentcreator.common.fluid.FluidMaterial;
 import surreal.contentcreator.common.item.ItemMaterial;
 import surreal.contentcreator.proxy.CommonProxy;
 import surreal.contentcreator.types.parts.PartItem;
@@ -173,7 +176,7 @@ public class CTMaterial {
 
     @ZenMethod
     public CTMaterial addFluid(String name, int temperature, @Optional int density, @Optional int viscosity, @Optional boolean block, @Optional String overlay) {
-        FluidBase fluid = FluidBase.create(name + "_" + this.name, name + "_still", name + "_flow", overlay).setCol(this.color).setRare(this.rarity).addBucket();
+        FluidBase fluid = FluidMaterial.create(name, this, name + "_still", name + "_flow", overlay).setCol(this.color).setRare(this.rarity).addBucket();
 
         this.fluids.put(name, fluid);
         fluid.setDen(density).setVis(viscosity);

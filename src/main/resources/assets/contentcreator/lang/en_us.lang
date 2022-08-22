@@ -7,5 +7,8 @@ part.plate=%s Plate
 part.plate_dense=Dense %s Plate
 part.stick=%s Rod
 
+part.molten=Molten %s
+part.gas=%s Gas
+
 temperature.molten=Melting Temperature
 temperature.gas=Evaporation Temperature
