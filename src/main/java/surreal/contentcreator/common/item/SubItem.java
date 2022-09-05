@@ -98,6 +98,13 @@ public class SubItem {
     public IItemBooleanStackFunc WOLFSFAVORITE = null;
     public IItemBooleanStackFunc ALWAYSEDIBLE = null;
 
+    // Effects
+    public IItemEffectHaloTexture HALOTEXTURE = null;
+    public IItemEffectHaloColor HALOCOLOR = null;
+    public IItemEffectHaloSpread HALOSPREAD = null;
+
+    public IItemEffectPulse PULSE = null;
+
     // Variables
     public final int meta;
     public Map<ResourceLocation, IItemPropertyFunc> itemProperties = null;
@@ -706,5 +713,55 @@ public class SubItem {
     public SubItem setPlayerDropped(IItemPlayerDrop func) {
         this.PLAYERDROP = func;
         return this;
+    }
+
+    @ZenMethod
+    public SubItem setHaloTexture(IItemEffectHaloTexture func) {
+        this.HALOTEXTURE = func;
+        return this;
+    }
+
+    @ZenMethod
+    public SubItem setHaloTexture(String texture) {
+        this.HALOTEXTURE = (world, player, stack) -> texture;
+        return this;
+    }
+
+    @ZenMethod
+    public SubItem setHaloTexture(int halo) {
+        this.HALOTEXTURE = (world, player, stack) -> getHaloTexture(halo);
+        return this;
+    }
+
+    @ZenMethod
+    public SubItem setHaloSize(IItemEffectHaloSpread func) {
+        this.HALOSPREAD = func;
+        return this;
+    }
+
+    @ZenMethod
+    public SubItem setHaloSize(int size) {
+        this.HALOSPREAD = (world, player, stack) -> size;
+        return this;
+    }
+
+    @ZenMethod
+    public SubItem setHaloColor(IItemEffectHaloColor func) {
+        this.HALOCOLOR = func;
+        return this;
+    }
+
+    @ZenMethod
+    public SubItem setHaloColor(int color) {
+        this.HALOCOLOR = (world, player, stack) -> color;
+        return this;
+    }
+
+    private String getHaloTexture(int halo) {
+        switch (halo) {
+            default: return "background/halo";
+            case 1: return "background/halo128";
+            case 2: return "background/halonoise";
+        }
     }
 }

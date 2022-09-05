@@ -15,9 +15,11 @@ import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import surreal.contentcreator.ModValues;
 import surreal.contentcreator.client.fluid.CustomFluidStateMapper;
 import surreal.contentcreator.common.block.BlockBase;
 import surreal.contentcreator.common.item.ItemBase;
@@ -45,6 +47,13 @@ public class ClientProxy extends CommonProxy {
 
         return 0xFFFFFF;
     };
+
+    @Override
+    public void preInit(FMLPreInitializationEvent event) {
+        texturesToRegister.add(ModValues.MODID + ":background/halo");
+        texturesToRegister.add(ModValues.MODID + ":background/halo128");
+        texturesToRegister.add(ModValues.MODID + ":background/halonoise");
+    }
 
     public static final IItemColor ITEMBLOCKCOLOR = (stack, index) -> {
         if (stack.getItem() instanceof ItemBlockBase) {

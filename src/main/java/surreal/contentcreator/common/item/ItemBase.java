@@ -45,6 +45,7 @@ import surreal.contentcreator.ModValues;
 import surreal.contentcreator.functions.item.IItemPropertyFunc;
 import surreal.contentcreator.proxy.CommonProxy;
 import surreal.contentcreator.util.CTUtil;
+import surreal.contentcreator.util.IHaloItem;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -55,7 +56,7 @@ import java.util.*;
 @ZenRegister
 @ZenClass("contentcreator.item.Item")
 @Optional.Interface(iface = "squeek.applecore.api.food.IEdible", modid = "applecore")
-public class ItemBase extends Item implements IEdible {
+public class ItemBase extends Item implements IEdible, IHaloItem {
     public final Map<Integer, SubItem> SUBITEMS;
     public boolean modelBlockState = false; // for not needing to mass model files
 
@@ -612,5 +613,28 @@ public class ItemBase extends Item implements IEdible {
     @Override
     public void renderHelmetOverlay(@Nonnull ItemStack stack, @Nonnull EntityPlayer player, @Nonnull ScaledResolution resolution, float partialTicks) {
         super.renderHelmetOverlay(stack, player, resolution, partialTicks);
+    }
+
+    @Override
+    public ResourceLocation getLocation(World world, EntityPlayer player, ItemStack stack) {
+        SubItem subItem = get(stack);
+        return subItem.HALOTEXTURE != null ? getTextureLocation(subItem.HALOTEXTURE.getTexture(CraftTweakerMC.getIWorld(world), CraftTweakerMC.getIPlayer(player), CraftTweakerMC.getIItemStack(stack))) : null;
+    }
+
+    @Override
+    public int getSpread(World world, EntityPlayer player, ItemStack stack) {
+        SubItem subItem = get(stack);
+        return subItem.HALOSPREAD != null ? subItem.HALOSPREAD.getSpread(CraftTweakerMC.getIWorld(world), CraftTweakerMC.getIPlayer(player), CraftTweakerMC.getIItemStack(stack)) : 1;
+    }
+
+    @Override
+    public int getColor(World world, EntityPlayer player, ItemStack stack) {
+        SubItem subItem = get(stack);
+        return subItem.HALOCOLOR != null ? subItem.HALOCOLOR.getColor(CraftTweakerMC.getIWorld(world), CraftTweakerMC.getIPlayer(player), CraftTweakerMC.getIItemStack(stack)) : 0xFF000000;
+    }
+
+    private ResourceLocation getTextureLocation(String location) {
+        if (!location.contains(":")) return new ResourceLocation(ModValues.MODID, location);
+        return new ResourceLocation(location);
     }
 }

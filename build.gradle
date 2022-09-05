@@ -1,6 +1,5 @@
 buildscript {
     repositories {
-        jcenter()
         maven { url = "https://files.minecraftforge.net/maven" }
     }
     dependencies {
@@ -52,8 +51,18 @@ processResources {
                 
         expand 'version':project.version, 'mcversion':project.minecraft.version
     }
-        
+
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
+    }
+}
+
+jar {
+    manifest {
+        attributes([
+                "FMLCorePluginContainsFMLMod": true,
+                "FMLCorePlugin": 'surreal.contentcreator.core.CCLoadingPlugin',
+                "ForceLoadAsMod": true
+        ])
     }
 }
