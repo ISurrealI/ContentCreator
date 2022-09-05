@@ -12,7 +12,6 @@ import crafttweaker.mc1120.item.MCItemStack;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
@@ -21,13 +20,17 @@ import stanhebben.zenscript.annotations.Optional;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenGetter;
 import stanhebben.zenscript.annotations.ZenMethod;
-import surreal.contentcreator.ModValues;
 import surreal.contentcreator.common.fluid.FluidBase;
 import surreal.contentcreator.common.fluid.FluidMaterial;
 import surreal.contentcreator.common.item.ItemMaterial;
+import surreal.contentcreator.functions.item.IItemEffectHaloColor;
+import surreal.contentcreator.functions.item.IItemEffectHaloSpread;
+import surreal.contentcreator.functions.item.IItemEffectHaloTexture;
+import surreal.contentcreator.functions.item.IItemEffectPulse;
 import surreal.contentcreator.proxy.CommonProxy;
 import surreal.contentcreator.types.parts.PartItem;
 import surreal.contentcreator.util.GeneralUtil;
+import surreal.contentcreator.util.IHaloItem;
 
 import java.util.*;
 
@@ -52,6 +55,13 @@ public class CTMaterial {
     public Map<String, Object> properties;
 
     public Map<String, FluidBase> fluids = new HashMap<>();
+
+    // Background
+    public IItemEffectHaloTexture HALOTEXTURE = null;
+    public IItemEffectHaloSpread HALOSPREAD = null;
+    public IItemEffectHaloColor HALOCOLOR = null;
+
+    public IItemEffectPulse EFFECTPULSE = null;
 
     private CTMaterial(int id, String name, int color) {
         this.id = id;
@@ -303,6 +313,48 @@ public class CTMaterial {
         }
 
         return null;
+    }
+
+    @ZenMethod
+    public CTMaterial setBackgroundTexture(IItemEffectHaloTexture func) {
+        this.HALOTEXTURE = func;
+        return this;
+    }
+
+    @ZenMethod
+    public CTMaterial setBackgroundTexture(String texture) {
+        this.HALOTEXTURE = (world, player, stack) -> texture;
+        return this;
+    }
+
+    @ZenMethod
+    public CTMaterial setBackgroundTexture(int halo) {
+        this.HALOTEXTURE = (world, player, stack) -> IHaloItem.getHaloTexture(halo);
+        return this;
+    }
+
+    @ZenMethod
+    public CTMaterial setBackgroundSize(IItemEffectHaloSpread func) {
+        this.HALOSPREAD = func;
+        return this;
+    }
+
+    @ZenMethod
+    public CTMaterial setBackgroundSize(int size) {
+        this.HALOSPREAD = (world, player, stack) -> size;
+        return this;
+    }
+
+    @ZenMethod
+    public CTMaterial setBackgroundColor(IItemEffectHaloColor func) {
+        this.HALOCOLOR = func;
+        return this;
+    }
+
+    @ZenMethod
+    public CTMaterial setBackgroundColor(int color) {
+        this.HALOCOLOR = (world, player, stack) -> color;
+        return this;
     }
 
     @ZenMethod

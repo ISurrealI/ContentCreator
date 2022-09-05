@@ -12,6 +12,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fluids.Fluid;
 import org.apache.commons.lang3.text.WordUtils;
 import surreal.contentcreator.ModValues;
@@ -264,5 +265,10 @@ public class GeneralUtil {
 
     public static Color getColorFromInt(int i) {
         return new Color((i >> 16) & 0xFF, (i >> 8) & 0xFF, i & 0xFF);
+    }
+
+    public static ResourceLocation getTextureLocation(String location) {
+        if (!location.contains(":")) return new ResourceLocation(ModValues.MODID, location);
+        return new ResourceLocation(location);
     }
 }

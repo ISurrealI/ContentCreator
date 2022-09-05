@@ -28,6 +28,7 @@ import surreal.contentcreator.ModValues;
 import surreal.contentcreator.functions.item.*;
 import surreal.contentcreator.util.CTUtil;
 import surreal.contentcreator.util.GeneralUtil;
+import surreal.contentcreator.util.IHaloItem;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -716,52 +717,44 @@ public class SubItem {
     }
 
     @ZenMethod
-    public SubItem setHaloTexture(IItemEffectHaloTexture func) {
+    public SubItem setBackgroundTexture(IItemEffectHaloTexture func) {
         this.HALOTEXTURE = func;
         return this;
     }
 
     @ZenMethod
-    public SubItem setHaloTexture(String texture) {
+    public SubItem setBackgroundTexture(String texture) {
         this.HALOTEXTURE = (world, player, stack) -> texture;
         return this;
     }
 
     @ZenMethod
-    public SubItem setHaloTexture(int halo) {
-        this.HALOTEXTURE = (world, player, stack) -> getHaloTexture(halo);
+    public SubItem setBackgroundTexture(int halo) {
+        this.HALOTEXTURE = (world, player, stack) -> IHaloItem.getHaloTexture(halo);
         return this;
     }
 
     @ZenMethod
-    public SubItem setHaloSize(IItemEffectHaloSpread func) {
+    public SubItem setBackgroundSize(IItemEffectHaloSpread func) {
         this.HALOSPREAD = func;
         return this;
     }
 
     @ZenMethod
-    public SubItem setHaloSize(int size) {
+    public SubItem setBackgroundSize(int size) {
         this.HALOSPREAD = (world, player, stack) -> size;
         return this;
     }
 
     @ZenMethod
-    public SubItem setHaloColor(IItemEffectHaloColor func) {
+    public SubItem setBackgroundColor(IItemEffectHaloColor func) {
         this.HALOCOLOR = func;
         return this;
     }
 
     @ZenMethod
-    public SubItem setHaloColor(int color) {
+    public SubItem setBackgroundColor(int color) {
         this.HALOCOLOR = (world, player, stack) -> color;
         return this;
-    }
-
-    private String getHaloTexture(int halo) {
-        switch (halo) {
-            default: return "background/halo";
-            case 1: return "background/halo128";
-            case 2: return "background/halonoise";
-        }
     }
 }

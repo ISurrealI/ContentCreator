@@ -45,6 +45,7 @@ import surreal.contentcreator.ModValues;
 import surreal.contentcreator.functions.item.IItemPropertyFunc;
 import surreal.contentcreator.proxy.CommonProxy;
 import surreal.contentcreator.util.CTUtil;
+import surreal.contentcreator.util.GeneralUtil;
 import surreal.contentcreator.util.IHaloItem;
 
 import javax.annotation.Nonnull;
@@ -618,7 +619,7 @@ public class ItemBase extends Item implements IEdible, IHaloItem {
     @Override
     public ResourceLocation getLocation(World world, EntityPlayer player, ItemStack stack) {
         SubItem subItem = get(stack);
-        return subItem.HALOTEXTURE != null ? getTextureLocation(subItem.HALOTEXTURE.getTexture(CraftTweakerMC.getIWorld(world), CraftTweakerMC.getIPlayer(player), CraftTweakerMC.getIItemStack(stack))) : null;
+        return subItem.HALOTEXTURE != null ? GeneralUtil.getTextureLocation(subItem.HALOTEXTURE.getTexture(CraftTweakerMC.getIWorld(world), CraftTweakerMC.getIPlayer(player), CraftTweakerMC.getIItemStack(stack))) : null;
     }
 
     @Override
@@ -631,10 +632,5 @@ public class ItemBase extends Item implements IEdible, IHaloItem {
     public int getColor(World world, EntityPlayer player, ItemStack stack) {
         SubItem subItem = get(stack);
         return subItem.HALOCOLOR != null ? subItem.HALOCOLOR.getColor(CraftTweakerMC.getIWorld(world), CraftTweakerMC.getIPlayer(player), CraftTweakerMC.getIItemStack(stack)) : 0xFF000000;
-    }
-
-    private ResourceLocation getTextureLocation(String location) {
-        if (!location.contains(":")) return new ResourceLocation(ModValues.MODID, location);
-        return new ResourceLocation(location);
     }
 }
