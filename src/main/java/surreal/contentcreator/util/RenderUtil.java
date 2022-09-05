@@ -56,7 +56,7 @@ public class RenderUtil {
 
             int xSize = sprite.getIconWidth() * spread;
             int ySize = sprite.getIconHeight() * spread;
-            drawTexturedModalRect(x - (7 * spread) - ((sprite.getIconWidth() * (spread - 1))/4), y - (7 * spread) - ((sprite.getIconHeight() * (spread - 1))/4), sprite, xSize, ySize);
+            drawTexturedModalRect(x - (7 * spread) - ((sprite.getIconWidth() * (spread - 1))/4) - 1, y - (7 * spread) - ((sprite.getIconHeight() * (spread - 1))/4) - 1, sprite, xSize, ySize);
         }
 
         /*if (renderPulse) {

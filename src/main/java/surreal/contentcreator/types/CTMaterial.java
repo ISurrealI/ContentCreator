@@ -20,6 +20,7 @@ import stanhebben.zenscript.annotations.Optional;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenGetter;
 import stanhebben.zenscript.annotations.ZenMethod;
+import surreal.contentcreator.ModValues;
 import surreal.contentcreator.common.fluid.FluidBase;
 import surreal.contentcreator.common.fluid.FluidMaterial;
 import surreal.contentcreator.common.item.ItemMaterial;
@@ -55,6 +56,8 @@ public class CTMaterial {
     public Map<String, Object> properties;
 
     public Map<String, FluidBase> fluids = new HashMap<>();
+
+    public boolean enchantedEffect;
 
     // Background
     public IItemEffectHaloTexture HALOTEXTURE = null;
@@ -354,6 +357,12 @@ public class CTMaterial {
     @ZenMethod
     public CTMaterial setBackgroundColor(int color) {
         this.HALOCOLOR = (world, player, stack) -> color;
+        return this;
+    }
+
+    @ZenMethod
+    public CTMaterial setEnchanted() {
+        this.enchantedEffect = true;
         return this;
     }
 

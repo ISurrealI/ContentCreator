@@ -29,6 +29,7 @@ import surreal.contentcreator.functions.item.IItemColorFunc;
 import surreal.contentcreator.types.CTMaterial;
 import surreal.contentcreator.util.CTUtil;
 import surreal.contentcreator.util.GeneralUtil;
+import surreal.contentcreator.util.IHaloItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,9 +51,16 @@ public class ClientProxy extends CommonProxy {
 
     @Override
     public void preInit(FMLPreInitializationEvent event) {
-        texturesToRegister.add(ModValues.MODID + ":background/halo");
-        texturesToRegister.add(ModValues.MODID + ":background/halo128");
-        texturesToRegister.add(ModValues.MODID + ":background/halonoise");
+        super.preInit(event);
+        registerHaloTextures();
+    }
+
+    private static void registerHaloTextures() {
+        if (!ModValues.AVARITIA) {
+            texturesToRegister.add(IHaloItem.getHaloTexture(0));
+            texturesToRegister.add(IHaloItem.getHaloTexture(1));
+            texturesToRegister.add(IHaloItem.getHaloTexture(2));
+        }
     }
 
     public static final IItemColor ITEMBLOCKCOLOR = (stack, index) -> {

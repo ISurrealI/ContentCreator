@@ -19,8 +19,8 @@ public class ContentCreator {
         if (!FluidRegistry.isUniversalBucketEnabled()) FluidRegistry.enableUniversalBucket();
     }
 
-    @SidedProxy(serverSide = COMMON, clientSide = CLIENT)
-    private static CommonProxy PROXY;
+    @SidedProxy(serverSide = "surreal.contentcreator.proxy.CommonProxy", clientSide = "surreal.contentcreator.proxy.ClientProxy")
+    public static CommonProxy PROXY;
 
     public static Logger getLogger() {
         return LOGGER;

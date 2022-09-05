@@ -12,9 +12,9 @@ public interface IHaloItem {
 
     static String getHaloTexture(int halo) {
         switch (halo) {
-            default: return "background/halo";
-            case 1: return "background/halo128";
-            case 2: return "background/halonoise";
+            default: return "avaritia:items/halo";
+            case 1: return "avaritia:items/halo128";
+            case 2: return "avaritia:items/halonoise";
         }
     }
 }

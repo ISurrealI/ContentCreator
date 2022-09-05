@@ -14,6 +14,7 @@ import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fml.common.Loader;
 import org.apache.commons.lang3.text.WordUtils;
 import surreal.contentcreator.ModValues;
 import surreal.contentcreator.common.block.BlockBase;
@@ -30,6 +31,7 @@ import java.io.IOException;
 import java.util.Collection;
 
 public class GeneralUtil {
+
     public static String toUppercase(CaseFormat from, CaseFormat to, String str) {
         return from.to(to, str);
     }

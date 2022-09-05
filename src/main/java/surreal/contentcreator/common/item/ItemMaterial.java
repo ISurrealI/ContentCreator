@@ -96,4 +96,10 @@ public class ItemMaterial extends Item implements IHaloItem {
         CTMaterial material = this.MATERIALS.get(stack.getMetadata());
         return material.HALOCOLOR != null ? material.HALOCOLOR.getColor(CraftTweakerMC.getIWorld(world), CraftTweakerMC.getIPlayer(player), CraftTweakerMC.getIItemStack(stack)) : 0xFF000000;
     }
+
+    @Override
+    public boolean hasEffect(@Nonnull ItemStack stack) {
+        CTMaterial material = this.MATERIALS.get(stack.getMetadata());
+        return material.enchantedEffect;
+    }
 }

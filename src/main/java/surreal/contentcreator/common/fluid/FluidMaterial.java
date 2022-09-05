@@ -5,6 +5,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fluids.FluidStack;
 import surreal.contentcreator.ModValues;
 import surreal.contentcreator.types.CTMaterial;
+import surreal.contentcreator.util.CTUtil;
 
 import javax.annotation.Nullable;
 
@@ -32,7 +33,7 @@ public class FluidMaterial extends FluidBase {
 
     @Override
     public String getLocalizedName(FluidStack stack) {
-        if (material != null) return I18n.format("part." + this.typeName, material.getLocalizedName());
+        if (material != null) return CTUtil.getRarity(material.rarity).rarityColor + I18n.format("part." + this.typeName, material.getLocalizedName());
         else return super.getLocalizedName(stack);
     }
 }
