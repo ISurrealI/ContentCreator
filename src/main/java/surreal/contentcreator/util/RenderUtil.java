@@ -18,7 +18,6 @@ public class RenderUtil {
 
     public static void renderBackground(ItemStack stack, int x, int y) {
         boolean renderHalo = false;
-        boolean renderPulse = false;
 
         int spread = 0;
         ResourceLocation halo = null;
@@ -33,7 +32,6 @@ public class RenderUtil {
             haloColour = ihri.getColor(WORLD, PLAYER, stack);
 
             renderHalo = halo != null;
-            //renderPulse = ihri.drawPulseEffect(item);
         }
 
         GlStateManager.enableBlend();
@@ -59,40 +57,24 @@ public class RenderUtil {
             drawTexturedModalRect(x - (7 * spread) - ((sprite.getIconWidth() * (spread - 1))/4) - 1, y - (7 * spread) - ((sprite.getIconHeight() * (spread - 1))/4) - 1, sprite, xSize, ySize);
         }
 
-        /*if (renderPulse) {
-            GL11.glPushMatrix();
-            double xs = (rand.nextGaussian() * 0.15) + 0.95;
-            double ox = (1-xs)/2.0;
-            GL11.glEnable(GL11.GL_BLEND);
-            GL11.glTranslated(ox*16.0, ox*16.0, 1.0);
-            GL11.glScaled(xs, xs, 1.0);
-
-            IIcon icon = item.getItem().getIcon(item, 0);
-
-            t.startDrawingQuads();
-            t.setColorRGBA_F(1.0f, 1.0f, 1.0f, 0.6f);
-            t.addVertexWithUV(0-ox, 0-ox, 0, icon.getMinU(), icon.getMinV());
-            t.addVertexWithUV(0-ox, 16+ox, 0, icon.getMinU(), icon.getMaxV());
-            t.addVertexWithUV(16+ox, 16+ox, 0, icon.getMaxU(), icon.getMaxV());
-            t.addVertexWithUV(16+ox, 0-ox, 0, icon.getMaxU(), icon.getMinV());
-            t.draw();
-
-            GL11.glPopMatrix();
-        }*/
-
         GlStateManager.disableBlend();
         GlStateManager.enableLighting();
         GlStateManager.enableDepth();
+    }
+
+    public static void setSize(ItemStack stack) {
+        if (stack.getItem() instanceof IHaloItem && ((IHaloItem) stack.getItem()).shouldPulse(WORLD, PLAYER, stack) && Minecraft.getSystemTime() % 3 == 0)
+            GlStateManager.scale(1.15F, 1.15F, 1);
     }
 
     private static void drawTexturedModalRect(int xCoord, int yCoord, TextureAtlasSprite textureSprite, int widthIn, int heightIn) {
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferbuilder = tessellator.getBuffer();
         bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX);
-        bufferbuilder.pos((double)(xCoord + 0), (double)(yCoord + heightIn), (double)1F).tex((double)textureSprite.getMinU(), (double)textureSprite.getMaxV()).endVertex();
-        bufferbuilder.pos((double)(xCoord + widthIn), (double)(yCoord + heightIn), (double)1F).tex((double)textureSprite.getMaxU(), (double)textureSprite.getMaxV()).endVertex();
-        bufferbuilder.pos((double)(xCoord + widthIn), (double)(yCoord + 0), (double)1F).tex((double)textureSprite.getMaxU(), (double)textureSprite.getMinV()).endVertex();
-        bufferbuilder.pos((double)(xCoord + 0), (double)(yCoord + 0), (double)1F).tex((double)textureSprite.getMinU(), (double)textureSprite.getMinV()).endVertex();
+        bufferbuilder.pos(xCoord, yCoord + heightIn, 1F).tex(textureSprite.getMinU(), textureSprite.getMaxV()).endVertex();
+        bufferbuilder.pos(xCoord + widthIn, yCoord + heightIn, 1F).tex(textureSprite.getMaxU(), textureSprite.getMaxV()).endVertex();
+        bufferbuilder.pos(xCoord + widthIn, yCoord, 1F).tex(textureSprite.getMaxU(), textureSprite.getMinV()).endVertex();
+        bufferbuilder.pos(xCoord, yCoord, 1F).tex(textureSprite.getMinU(), textureSprite.getMinV()).endVertex();
         tessellator.draw();
     }
 }

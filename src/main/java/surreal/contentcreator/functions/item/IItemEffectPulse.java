@@ -6,8 +6,8 @@ import crafttweaker.api.world.IWorld;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
 
-@ZenClass("contenttweaker.item.functions.BGSpread")
+@ZenClass("contenttweaker.item.functions.Pulse")
 public interface IItemEffectPulse {
     @ZenMethod
-    int getSpread(IWorld world, IPlayer player, IItemStack stack);
+    boolean shouldPulse(IWorld world, IPlayer player, IItemStack stack);
 }

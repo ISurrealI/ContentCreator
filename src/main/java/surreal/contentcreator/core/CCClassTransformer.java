@@ -42,6 +42,30 @@ public class CCClassTransformer implements IClassTransformer {
     static {
         MAP.put("net.minecraft.client.renderer.RenderItem", clazz -> {
             for (MethodNode method : clazz.methods) {
+                if (method.name.equals(CCLoadingPlugin.DEOBF ? "renderItemModelIntoGUI" : "func_191962_a")) {
+                    AbstractInsnNode node = null;
+                    for (AbstractInsnNode n : method.instructions.toArray()) {
+                        if (n instanceof LineNumberNode && ((LineNumberNode) n).line == 313) {
+                            node = n.getNext();
+                            break;
+                        }
+                    }
+
+                    if (node != null) {
+                        InsnList list = new InsnList();
+                        list.add(new VarInsnNode(ALOAD, 1));
+                        list.add(new MethodInsnNode(INVOKESTATIC, "surreal/contentcreator/util/RenderUtil", "setSize", "(Lnet/minecraft/item/ItemStack;)V", false));
+                        method.instructions.insertBefore(node, list);
+
+                        list.clear();
+                        list.add(new InsnNode(FCONST_1));
+                        list.add(new InsnNode(FCONST_1));
+                        list.add(new InsnNode(FCONST_1));
+                        list.add(new MethodInsnNode(INVOKESTATIC, "net/minecraft/client/renderer/GlStateManager", CCLoadingPlugin.DEOBF ? "scale" : "func_179152_a", "(FFF)V", false));
+                        method.instructions.insertBefore(node.getNext().getNext().getNext().getNext(), list);
+                    }
+                }
+
                 if (method.name.equals(CCLoadingPlugin.DEOBF ? "renderItemAndEffectIntoGUI" : "func_184391_a")) {
                     AbstractInsnNode node = null;
                     for (AbstractInsnNode n : method.instructions.toArray()) {

@@ -98,6 +98,12 @@ public class ItemMaterial extends Item implements IHaloItem {
     }
 
     @Override
+    public boolean shouldPulse(World world, EntityPlayer player, ItemStack stack) {
+        CTMaterial material = this.MATERIALS.get(stack.getMetadata());
+        return material.EFFECTPULSE != null && material.EFFECTPULSE.shouldPulse(CraftTweakerMC.getIWorld(world), CraftTweakerMC.getIPlayer(player), CraftTweakerMC.getIItemStack(stack));
+    }
+
+    @Override
     public boolean hasEffect(@Nonnull ItemStack stack) {
         CTMaterial material = this.MATERIALS.get(stack.getMetadata());
         return material.enchantedEffect;

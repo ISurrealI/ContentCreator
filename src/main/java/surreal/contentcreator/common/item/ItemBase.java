@@ -633,4 +633,10 @@ public class ItemBase extends Item implements IEdible, IHaloItem {
         SubItem subItem = get(stack);
         return subItem.HALOCOLOR != null ? subItem.HALOCOLOR.getColor(CraftTweakerMC.getIWorld(world), CraftTweakerMC.getIPlayer(player), CraftTweakerMC.getIItemStack(stack)) : 0xFF000000;
     }
+
+    @Override
+    public boolean shouldPulse(World world, EntityPlayer player, ItemStack stack) {
+        SubItem subItem = get(stack);
+        return subItem.PULSE != null && subItem.PULSE.shouldPulse(CraftTweakerMC.getIWorld(world), CraftTweakerMC.getIPlayer(player), CraftTweakerMC.getIItemStack(stack));
+    }
 }

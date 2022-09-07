@@ -757,4 +757,16 @@ public class SubItem {
         this.HALOCOLOR = (world, player, stack) -> color;
         return this;
     }
+
+    @ZenMethod
+    public SubItem setPulseEffect(IItemEffectPulse func) {
+        this.PULSE = func;
+        return this;
+    }
+
+    @ZenMethod
+    public SubItem setPulseEffect() {
+        this.PULSE = (world, player, stack) -> true;
+        return this;
+    }
 }

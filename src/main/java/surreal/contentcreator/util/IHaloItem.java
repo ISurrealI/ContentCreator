@@ -9,6 +9,7 @@ public interface IHaloItem {
     ResourceLocation getLocation(World world, EntityPlayer player, ItemStack stack);
     int getSpread(World world, EntityPlayer player, ItemStack stack);
     int getColor(World world, EntityPlayer player, ItemStack stack);
+    boolean shouldPulse(World world, EntityPlayer player, ItemStack stack);
 
     static String getHaloTexture(int halo) {
         switch (halo) {
