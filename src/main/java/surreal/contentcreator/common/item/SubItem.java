@@ -4,18 +4,19 @@ import crafttweaker.annotations.ZenRegister;
 import crafttweaker.api.item.IItemStack;
 import crafttweaker.api.minecraft.CraftTweakerMC;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockSnow;
-import net.minecraft.block.BlockSnowBlock;
-import net.minecraft.block.BlockWeb;
+import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
@@ -768,5 +769,62 @@ public class SubItem {
     public SubItem setPulseEffect() {
         this.PULSE = (world, player, stack) -> true;
         return this;
+    }
+
+    @ZenMethod
+    public SubItem setBlock(crafttweaker.api.block.IBlockState state) {
+        this.ITEMUSE = (iplayer, world, ipos, hand, ifacing, hitX, hitY, hitZ) -> {
+            World worldIn = CraftTweakerMC.getWorld(world);
+            BlockPos pos = CraftTweakerMC.getBlockPos(ipos);
+            EnumFacing facing = CraftTweakerMC.getFacing(ifacing);
+            EntityPlayer player = CraftTweakerMC.getPlayer(iplayer);
+
+            IBlockState iblockstate = worldIn.getBlockState(pos);
+            Block block = iblockstate.getBlock();
+
+            if (!block.isReplaceable(worldIn, pos))
+            {
+                pos = pos.offset(facing);
+            }
+
+            ItemStack itemstack = player.getHeldItem(CraftTweakerMC.getHand(hand));
+
+            if (!itemstack.isEmpty() && player.canPlayerEdit(pos, facing, itemstack) && worldIn.mayPlace(CraftTweakerMC.getBlockState(state).getBlock(), pos, false, facing, player))
+            {
+                int i = state.getMeta();
+                IBlockState iblockstate1 = CraftTweakerMC.getBlockState(state).getBlock().getStateForPlacement(worldIn, pos, facing, hitX, hitY, hitZ, i, player, CraftTweakerMC.getHand(hand));
+
+                if (placeBlockAt(itemstack, player, worldIn, pos, facing, hitX, hitY, hitZ, iblockstate1))
+                {
+                    iblockstate1 = worldIn.getBlockState(pos);
+                    SoundType soundtype = iblockstate1.getBlock().getSoundType(iblockstate1, worldIn, pos, player);
+                    worldIn.playSound(player, pos, soundtype.getPlaceSound(), SoundCategory.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
+                    itemstack.shrink(1);
+                }
+
+                return "SUCCESS";
+            }
+
+            else return "FAIL";
+        };
+
+        return this;
+    }
+
+    private boolean placeBlockAt(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, IBlockState newState)
+    {
+        if (!world.setBlockState(pos, newState, 11)) return false;
+
+        IBlockState state = world.getBlockState(pos);
+        if (state.getBlock() == newState.getBlock())
+        {
+            ItemBlock.setTileEntityNBT(world, player, pos, stack);
+            newState.getBlock().onBlockPlacedBy(world, pos, state, player, stack);
+
+            if (player instanceof EntityPlayerMP)
+                CriteriaTriggers.PLACED_BLOCK.trigger((EntityPlayerMP)player, pos, stack);
+        }
+
+        return true;
     }
 }

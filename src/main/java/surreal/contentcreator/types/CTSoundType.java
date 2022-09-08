@@ -56,6 +56,10 @@ public class CTSoundType {
         return this.type.getFallSound();
     }
 
+    public SoundType getType() {
+        return type;
+    }
+
     @ZenMethod("get")
     public static CTSoundType getCT(String name) {
         SoundType type = get(name);
