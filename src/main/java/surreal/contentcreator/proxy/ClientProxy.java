@@ -22,8 +22,10 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import surreal.contentcreator.ModValues;
 import surreal.contentcreator.client.fluid.CustomFluidStateMapper;
 import surreal.contentcreator.common.block.BlockBase;
+import surreal.contentcreator.common.block.BlockMaterial;
 import surreal.contentcreator.common.item.ItemBase;
 import surreal.contentcreator.common.item.ItemBlockBase;
+import surreal.contentcreator.common.item.ItemBlockMaterial;
 import surreal.contentcreator.common.item.ItemMaterial;
 import surreal.contentcreator.functions.item.IItemColorFunc;
 import surreal.contentcreator.types.CTMaterial;
@@ -68,6 +70,10 @@ public class ClientProxy extends CommonProxy {
             ItemBlockBase item = (ItemBlockBase) stack.getItem();
             if (item.blockBase.COLOR != null) return item.blockBase.COLOR.colorMultiplier(CraftTweakerMC.getBlockState(item.blockBase.getStateFromMeta(stack.getMetadata())), index);
         }
+        if (stack.getItem() instanceof ItemBlockMaterial) {
+            CTMaterial material = ((ItemBlockMaterial) stack.getItem()).getMaterial(stack);
+            return material.color;
+        }
 
         return 0xFFFFFF;
     };
@@ -85,6 +91,15 @@ public class ClientProxy extends CommonProxy {
         if (state.getBlock() instanceof BlockBase) {
             BlockBase block = (BlockBase) state.getBlock();
             if (block.COLOR != null) return block.COLOR.colorMultiplier(CraftTweakerMC.getBlockState(state), tintIndex);
+        }
+
+        return 0xFFFFFF;
+    };
+
+    public static final IBlockColor BLOCKMATERIALCOLOR = (state, worldIn, pos, tintIndex) -> {
+        if (state.getBlock() instanceof BlockMaterial) {
+            BlockMaterial block = (BlockMaterial) state.getBlock();
+            return block.materials[block.getMetaFromState(state)].color;
         }
 
         return 0xFFFFFF;
@@ -143,6 +158,7 @@ public class ClientProxy extends CommonProxy {
         GeneralUtil.generateItemFiles(ITEMS);
         GeneralUtil.generateMatItems(MAT_ITEMS.values());
         GeneralUtil.generateBlocks(BLOCKS);
+        GeneralUtil.generateBlocks(MAT_BLOCKS);
         GeneralUtil.generateFiles();
         GeneralUtil.generateFluidFiles(FLUIDS);
     }
@@ -151,6 +167,9 @@ public class ClientProxy extends CommonProxy {
     public static void regColorsBlock(ColorHandlerEvent.Block event) {
         for (Block block : CommonProxy.BLOCKS) {
             event.getBlockColors().registerBlockColorHandler(BLOCKCOLOR, block);
+        }
+        for (Block block : CommonProxy.MAT_BLOCKS) {
+            event.getBlockColors().registerBlockColorHandler(BLOCKMATERIALCOLOR, block);
         }
     }
 

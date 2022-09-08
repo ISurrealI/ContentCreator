@@ -14,27 +14,28 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.registries.IForgeRegistry;
+import org.apache.commons.lang3.tuple.Pair;
 import surreal.contentcreator.ContentCreator;
+import surreal.contentcreator.common.block.BlockMaterial;
 import surreal.contentcreator.common.fluid.FluidBase;
 import surreal.contentcreator.common.fluid.FluidBlockBase;
 import surreal.contentcreator.common.item.ItemBase;
 import surreal.contentcreator.common.item.ItemMaterial;
 import surreal.contentcreator.common.item.SubItem;
 import surreal.contentcreator.types.CTMaterial;
+import surreal.contentcreator.types.parts.PartBlock;
 import surreal.contentcreator.types.parts.PartItem;
 import surreal.contentcreator.util.CTUtil;
 import surreal.contentcreator.ModValues;
 import surreal.contentcreator.brackets.ItemBracketHandler;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Mod.EventBusSubscriber(modid = ModValues.MODID)
 public class CommonProxy {
     public static List<ItemBase> ITEMS = new ArrayList<>();
     public static Map<String, ItemMaterial> MAT_ITEMS = new HashMap<>();
+    public static List<Block> MAT_BLOCKS = new ArrayList<>();
     public static List<ItemBlock> ITEMBLOCKS = new ArrayList<>();
 
     public static List<Block> FLUID_BLOCKS = new ArrayList<>();
@@ -46,6 +47,7 @@ public class CommonProxy {
     public void preInit(FMLPreInitializationEvent event) {
         registerFluids();
         registerMatItems();
+        registerMatBlocks();
     }
 
     public void postInit(FMLPostInitializationEvent event) {
@@ -73,6 +75,33 @@ public class CommonProxy {
         }
     }
 
+    private static void registerMatBlocks() {
+        for (PartBlock part : PartBlock.PARTS.values()) {
+            int matSize = part.materials.size();
+            int blockCount = matSize / 16;
+            int lastBlock = matSize % 16;
+
+            for (int i = 0; i < blockCount; i++) {
+                CTMaterial[] mats = new CTMaterial[16];
+                for (int g = 0; g < 16; g++) {
+                    int v = i * 16;
+                    mats[g + v] = part.materials.get(g + v);
+                }
+                BlockMaterial.setProperty(mats.length);
+                BlockMaterial block = new BlockMaterial(i, part, mats);
+                MAT_BLOCKS.add(block);
+            }
+
+            CTMaterial[] mats = new CTMaterial[lastBlock];
+            for (int i = (matSize - lastBlock); i < matSize; i++) {
+                mats[i - (matSize - lastBlock)] = part.materials.get(i);
+            }
+            BlockMaterial.setProperty(mats.length);
+            BlockMaterial block = new BlockMaterial(blockCount, part, mats);
+            MAT_BLOCKS.add(block);
+        }
+    }
+
     @SubscribeEvent
     public static void registerSounds(RegistryEvent.Register<SoundEvent> event) {
         IForgeRegistry<SoundEvent> registry = event.getRegistry();
@@ -92,6 +121,7 @@ public class CommonProxy {
         IForgeRegistry<Block> registry = event.getRegistry();
         FLUID_BLOCKS.forEach(registry::register);
         BLOCKS.forEach(registry::register);
+        MAT_BLOCKS.forEach(registry::register);
     }
     
     @SubscribeEvent
@@ -118,5 +148,20 @@ public class CommonProxy {
                 }
             }
         }
+    }
+
+    public static Pair<Block, Integer> getBlockAndMetaFromMaterial(String partName, CTMaterial material) {
+        PartBlock part = PartBlock.PARTS.get(partName);
+
+        if (part != null && material != null) {
+            for (int i = 0; i < part.materials.size(); i++) {
+                if (part.materials.get(i) == material) {
+                    Block block = MAT_BLOCKS.get(i/16);
+                    return Pair.of(block, i%16);
+                }
+            }
+        }
+
+        return null;
     }
 }

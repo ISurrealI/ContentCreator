@@ -4,11 +4,13 @@ import com.google.common.base.CaseFormat;
 import com.google.common.collect.Maps;
 import crafttweaker.CraftTweakerAPI;
 import crafttweaker.annotations.ZenRegister;
+import crafttweaker.api.block.IBlockState;
 import crafttweaker.api.block.IMaterial;
 import crafttweaker.api.item.IItemStack;
 import crafttweaker.api.liquid.ILiquidStack;
 import crafttweaker.api.minecraft.CraftTweakerMC;
 import crafttweaker.mc1120.item.MCItemStack;
+import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
@@ -16,10 +18,12 @@ import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import org.apache.commons.lang3.text.WordUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import stanhebben.zenscript.annotations.Optional;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenGetter;
 import stanhebben.zenscript.annotations.ZenMethod;
+import surreal.contentcreator.common.block.BlockMaterial;
 import surreal.contentcreator.common.fluid.FluidBase;
 import surreal.contentcreator.common.fluid.FluidMaterial;
 import surreal.contentcreator.common.item.ItemMaterial;
@@ -28,6 +32,7 @@ import surreal.contentcreator.functions.item.IItemEffectHaloSpread;
 import surreal.contentcreator.functions.item.IItemEffectHaloTexture;
 import surreal.contentcreator.functions.item.IItemEffectPulse;
 import surreal.contentcreator.proxy.CommonProxy;
+import surreal.contentcreator.types.parts.PartBlock;
 import surreal.contentcreator.types.parts.PartItem;
 import surreal.contentcreator.util.GeneralUtil;
 import surreal.contentcreator.util.IHaloItem;
@@ -57,6 +62,8 @@ public class CTMaterial {
     public Map<String, FluidBase> fluids = new HashMap<>();
 
     public boolean enchantedEffect;
+
+    public Material blockMaterial = null;
 
     // Background
     public IItemEffectHaloTexture HALOTEXTURE = null;
@@ -108,6 +115,13 @@ public class CTMaterial {
     @ZenMethod
     public CTMaterial addItem(String type, @Optional String oreName) {
         PartItem part = PartItem.PARTS.containsKey(type) ? PartItem.PARTS.get(type) : new PartItem(type, (oreName == null ? type : oreName));
+        part.materials.add(this);
+        return this;
+    }
+
+    @ZenMethod
+    public CTMaterial addBlock(String type, @Optional String oreName) {
+        PartBlock part = PartBlock.PARTS.containsKey(type) ? PartBlock.PARTS.get(type) : new PartBlock(type, (oreName == null ? type : oreName));
         part.materials.add(this);
         return this;
     }
@@ -187,6 +201,16 @@ public class CTMaterial {
     }
 
     @ZenMethod
+    public CTMaterial addBlocks(String... type) {
+        for (String str : type) {
+            PartBlock part = PartBlock.PARTS.containsKey(str) ? PartBlock.PARTS.get(str) : new PartBlock(str, str);
+            part.materials.add(this);
+        }
+
+        return this;
+    }
+
+    @ZenMethod
     public CTMaterial addFluid(String name, int temperature, @Optional int density, @Optional int viscosity, @Optional boolean block, @Optional String overlay) {
         FluidBase fluid = FluidMaterial.create(name, this, name + "_still", name + "_flow", overlay).setCol(this.color).setRare(this.rarity).addBucket();
 
@@ -236,6 +260,20 @@ public class CTMaterial {
         }
 
         return new MCItemStack(new ItemStack(item, 1, this.id));
+    }
+
+    @ZenMethod
+    public IItemStack getBlock(String part) {
+        Pair<Block, Integer> pair = CommonProxy.getBlockAndMetaFromMaterial(part, this);
+        if (pair != null) return CraftTweakerMC.getIItemStack(new ItemStack(pair.getKey(), 1, pair.getValue()));
+        return null;
+    }
+
+    @ZenMethod
+    public IBlockState getBlockState(String part) {
+        Pair<Block, Integer> pair = CommonProxy.getBlockAndMetaFromMaterial(part, this);
+        if (pair != null) return CraftTweakerMC.getBlockState(pair.getKey().getStateFromMeta(pair.getValue()));
+        return null;
     }
 
     @ZenMethod
@@ -374,6 +412,12 @@ public class CTMaterial {
     @ZenMethod
     public CTMaterial setEnchanted() {
         this.enchantedEffect = true;
+        return this;
+    }
+
+    @ZenMethod
+    public CTMaterial setMaterial(IMaterial material) {
+        this.blockMaterial = CraftTweakerMC.getMaterial(material);
         return this;
     }
 

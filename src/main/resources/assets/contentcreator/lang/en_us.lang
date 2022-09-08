@@ -10,5 +10,9 @@ part.stick=%s Rod
 part.molten=Molten %s
 part.gas=%s Gas
 
+part.block=Block of %s
+
 temperature.molten=Melting Temperature
 temperature.gas=Evaporation Temperature
+
+material.generic=Material

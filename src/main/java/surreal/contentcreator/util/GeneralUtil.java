@@ -18,6 +18,7 @@ import net.minecraftforge.fml.common.Loader;
 import org.apache.commons.lang3.text.WordUtils;
 import surreal.contentcreator.ModValues;
 import surreal.contentcreator.common.block.BlockBase;
+import surreal.contentcreator.common.block.BlockMaterial;
 import surreal.contentcreator.common.fluid.FluidBase;
 import surreal.contentcreator.common.item.ItemBase;
 import surreal.contentcreator.common.item.ItemMaterial;
@@ -171,19 +172,38 @@ public class GeneralUtil {
 
             JsonObject defaults = new JsonObject();
             defaults.addProperty("transform", "forge:default-block");
-            defaults.addProperty("model", "cube_all");
+            if (block instanceof BlockMaterial) {
+                defaults.addProperty("model", "contentcreator:tinted_cube_all");
+            } else defaults.addProperty("model", "cube_all");
 
             JsonObject textures = new JsonObject();
-            textures.addProperty("all", ModValues.MODID + ":blocks/" + block.getRegistryName().getResourcePath());
+            if (block instanceof BlockMaterial) textures.addProperty("all", ModValues.MODID + ":blocks/part/" + ((BlockMaterial) block).part.name);
+            else textures.addProperty("all", ModValues.MODID + ":blocks/" + block.getRegistryName().getResourcePath());
             defaults.add("textures", textures);
 
             object.add("defaults", defaults);
 
             JsonObject variants = new JsonObject();
-            JsonArray mongus = new JsonArray();
-            mongus.add(new JsonObject());
-            variants.add("normal", mongus);
-            variants.add("inventory", mongus);
+            if (block instanceof BlockMaterial) {
+                BlockMaterial b = (BlockMaterial) block;
+                JsonObject material = new JsonObject();
+                for (int i = 0; i < b.materials.length; i++) {
+                    JsonObject mat = new JsonObject();
+                    mat.add("textures", textures);
+                    material.add("" + i, mat);
+                }
+                variants.add("material", material);
+
+                JsonArray mongus = new JsonArray();
+                mongus.add(new JsonObject());
+                variants.add("inventory", mongus);
+            } else {
+                JsonArray mongus = new JsonArray();
+                mongus.add(new JsonObject());
+                variants.add("normal", mongus);
+                variants.add("inventory", mongus);
+            }
+
             object.add("variants", variants);
 
             try {
