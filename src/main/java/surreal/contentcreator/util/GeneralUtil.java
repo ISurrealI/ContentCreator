@@ -19,6 +19,7 @@ import org.apache.commons.lang3.text.WordUtils;
 import surreal.contentcreator.ModValues;
 import surreal.contentcreator.common.block.BlockBase;
 import surreal.contentcreator.common.block.BlockMaterial;
+import surreal.contentcreator.common.block.generic.IGenericBlock;
 import surreal.contentcreator.common.fluid.FluidBase;
 import surreal.contentcreator.common.item.ItemBase;
 import surreal.contentcreator.common.item.ItemMaterial;
@@ -32,6 +33,12 @@ import java.io.IOException;
 import java.util.Collection;
 
 public class GeneralUtil {
+    public static final JsonObject EMPTY_OBJECT = new JsonObject();
+    public static final JsonArray EMPTY_ARRAY = new JsonArray();
+
+    static {
+        EMPTY_ARRAY.add(new JsonObject());
+    }
 
     public static String toUppercase(CaseFormat from, CaseFormat to, String str) {
         return from.to(to, str);
@@ -172,38 +179,14 @@ public class GeneralUtil {
 
             JsonObject defaults = new JsonObject();
             defaults.addProperty("transform", "forge:default-block");
-            if (block instanceof BlockMaterial) {
-                defaults.addProperty("model", "contentcreator:tinted_cube_all");
-            } else defaults.addProperty("model", "cube_all");
+            defaults.addProperty("model", getModelLocation(block));
 
-            JsonObject textures = new JsonObject();
-            if (block instanceof BlockMaterial) textures.addProperty("all", ModValues.MODID + ":blocks/part/" + ((BlockMaterial) block).part.name);
-            else textures.addProperty("all", ModValues.MODID + ":blocks/" + block.getRegistryName().getResourcePath());
-            defaults.add("textures", textures);
+            JsonObject textures = getTextures(block);
+            if (!(block instanceof BlockMaterial)) defaults.add("textures", textures);
 
             object.add("defaults", defaults);
 
-            JsonObject variants = new JsonObject();
-            if (block instanceof BlockMaterial) {
-                BlockMaterial b = (BlockMaterial) block;
-                JsonObject material = new JsonObject();
-                for (int i = 0; i < b.materials.length; i++) {
-                    JsonObject mat = new JsonObject();
-                    mat.add("textures", textures);
-                    material.add("" + i, mat);
-                }
-                variants.add("material", material);
-
-                JsonArray mongus = new JsonArray();
-                mongus.add(new JsonObject());
-                variants.add("inventory", mongus);
-            } else {
-                JsonArray mongus = new JsonArray();
-                mongus.add(new JsonObject());
-                variants.add("normal", mongus);
-                variants.add("inventory", mongus);
-            }
-
+            JsonObject variants = getVariants(block, textures);
             object.add("variants", variants);
 
             try {
@@ -219,6 +202,48 @@ public class GeneralUtil {
                 e.printStackTrace();
             }
         }
+    }
+
+    private static String getModelLocation(Block block) {
+        if (block instanceof BlockMaterial) return "contentcreator:tinted_cube_all";
+        else if (block instanceof IGenericBlock) return ((IGenericBlock) block).getModelLocation();
+        else return "cube_all";
+    }
+
+    private static JsonObject getTextures(Block block) {
+        JsonObject textures = new JsonObject();
+        if (block instanceof BlockMaterial) textures.addProperty("all", ModValues.MODID + ":blocks/part/" + ((BlockMaterial) block).part.name);
+        else if (block instanceof IGenericBlock) ((IGenericBlock) block).setTextures(block, textures);
+        else textures.addProperty("all", ModValues.MODID + ":blocks/" + block.getRegistryName().getResourcePath());
+
+        return textures;
+    }
+
+    private static JsonObject getVariants(Block block, JsonObject textures) {
+        JsonObject variants = new JsonObject();
+        if (block instanceof BlockMaterial) {
+            BlockMaterial b = (BlockMaterial) block;
+            JsonObject material = new JsonObject();
+            for (int i = 0; i < b.materials.length; i++) {
+                JsonObject mat = new JsonObject();
+                mat.add("textures", textures);
+                material.add("" + i, mat);
+            }
+            variants.add("material", material);
+
+            JsonArray mongus = new JsonArray();
+            mongus.add(new JsonObject());
+            variants.add("inventory", mongus);
+        } else if (block instanceof IGenericBlock) {
+            ((IGenericBlock) block).setVariants(block, variants);
+        } else {
+            JsonArray mongus = new JsonArray();
+            mongus.add(new JsonObject());
+            variants.add("normal", mongus);
+            variants.add("inventory", mongus);
+        }
+
+        return variants;
     }
 
     public static void generateFluidFiles(Collection<FluidBase> list) {

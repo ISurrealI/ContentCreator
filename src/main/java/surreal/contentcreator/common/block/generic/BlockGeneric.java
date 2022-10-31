@@ -8,6 +8,7 @@ import crafttweaker.api.minecraft.CraftTweakerMC;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
 import stanhebben.zenscript.annotations.Optional;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
@@ -43,8 +44,8 @@ public class BlockGeneric {
     }
 
     @ZenMethod
-    public static BlockGeneric createBlockColored(IMaterial material, String name) {
-        return new BlockGeneric(createBlock(new BlockGenericColored(CraftTweakerMC.getMaterial(material)), name));
+    public static BlockGeneric createBlockColored(IMaterial material, String name, @Optional boolean color) {
+        return new BlockGeneric(createBlock(new BlockGenericColored(CraftTweakerMC.getMaterial(material), color), name));
     }
 
     @ZenMethod
@@ -110,7 +111,7 @@ public class BlockGeneric {
 
     @ZenMethod
     public static BlockGeneric createSlab(IMaterial material, MapColor mapColor, String name) {
-        return new BlockGeneric(createBlock(new BlockGenericHalfSlab(CraftTweakerMC.getMaterial(material), mapColor), name));
+        return new BlockGeneric(new BlockGenericHalfSlab(CraftTweakerMC.getMaterial(material), mapColor, name));
     }
 
     @ZenMethod
@@ -185,7 +186,9 @@ public class BlockGeneric {
     public void register() {
         ((IGenericBlock) this.block).create(CommonProxy.BLOCKS);
         CommonProxy.BLOCKS.add(this.block);
-        CommonProxy.ITEMBLOCKS.add(new ItemBlockBase(this.block));
+
+        Item item = ((IGenericBlock) block).createItem(block);
+        if (item != null) CommonProxy.ITEMBLOCKS.add(item);
     }
 
     private static Block createBlock(Block block, String name) {

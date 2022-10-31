@@ -2,10 +2,12 @@ package surreal.contentcreator.proxy;
 
 import crafttweaker.api.minecraft.CraftTweakerMC;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockColored;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.color.IBlockColor;
 import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.util.ResourceLocation;
@@ -23,6 +25,7 @@ import surreal.contentcreator.ModValues;
 import surreal.contentcreator.client.fluid.CustomFluidStateMapper;
 import surreal.contentcreator.common.block.BlockBase;
 import surreal.contentcreator.common.block.BlockMaterial;
+import surreal.contentcreator.common.block.generic.BlockGenericColored;
 import surreal.contentcreator.common.item.ItemBase;
 import surreal.contentcreator.common.item.ItemBlockBase;
 import surreal.contentcreator.common.item.ItemBlockMaterial;
@@ -68,7 +71,8 @@ public class ClientProxy extends CommonProxy {
     public static final IItemColor ITEMBLOCKCOLOR = (stack, index) -> {
         if (stack.getItem() instanceof ItemBlockBase) {
             ItemBlockBase item = (ItemBlockBase) stack.getItem();
-            if (item.blockBase.COLOR != null) return item.blockBase.COLOR.colorMultiplier(CraftTweakerMC.getBlockState(item.blockBase.getStateFromMeta(stack.getMetadata())), index);
+            if (item.blockBase != null && item.blockBase.COLOR != null) return item.blockBase.COLOR.colorMultiplier(CraftTweakerMC.getBlockState(item.blockBase.getStateFromMeta(stack.getMetadata())), index);
+            else if (item.getBlock() instanceof BlockGenericColored && ((BlockGenericColored) item.getBlock()).color) return EnumDyeColor.byDyeDamage(stack.getMetadata()).getColorValue();
         }
         if (stack.getItem() instanceof ItemBlockMaterial) {
             CTMaterial material = ((ItemBlockMaterial) stack.getItem()).getMaterial(stack);
@@ -91,6 +95,8 @@ public class ClientProxy extends CommonProxy {
         if (state.getBlock() instanceof BlockBase) {
             BlockBase block = (BlockBase) state.getBlock();
             if (block.COLOR != null) return block.COLOR.colorMultiplier(CraftTweakerMC.getBlockState(state), tintIndex);
+        } else if (state.getBlock() instanceof BlockGenericColored && ((BlockGenericColored) state.getBlock()).color) {
+            return EnumDyeColor.byDyeDamage(state.getBlock().getMetaFromState(state)).getColorValue();
         }
 
         return 0xFFFFFF;
@@ -143,7 +149,7 @@ public class ClientProxy extends CommonProxy {
             }
         }
 
-        for (ItemBlock item : CommonProxy.ITEMBLOCKS) {
+        for (Item item : CommonProxy.ITEMBLOCKS) {
             for (int i = 0; i < CTUtil.getStacks(item).size(); i++) {
                 ModelLoader.setCustomModelResourceLocation(item, i, new ModelResourceLocation(item.getRegistryName(), "inventory"));
             }

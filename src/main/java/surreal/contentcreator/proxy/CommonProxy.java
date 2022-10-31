@@ -36,7 +36,7 @@ public class CommonProxy {
     public static List<ItemBase> ITEMS = new ArrayList<>();
     public static Map<String, ItemMaterial> MAT_ITEMS = new HashMap<>();
     public static List<Block> MAT_BLOCKS = new ArrayList<>();
-    public static List<ItemBlock> ITEMBLOCKS = new ArrayList<>();
+    public static List<Item> ITEMBLOCKS = new ArrayList<>();
 
     public static List<Block> FLUID_BLOCKS = new ArrayList<>();
     public static List<Block> BLOCKS = new ArrayList<>();
