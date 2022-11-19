@@ -13,12 +13,10 @@ import stanhebben.zenscript.annotations.Optional;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
 import surreal.contentcreator.ModValues;
-import surreal.contentcreator.common.item.ItemBlockBase;
 import surreal.contentcreator.proxy.CommonProxy;
 import surreal.contentcreator.types.CTSoundEvent;
 import surreal.contentcreator.types.CTSoundType;
 
-// TODO seeds for crops
 @ZenRegister
 @ZenClass("contentcreator.block.GenericBlock")
 public class BlockGeneric {
@@ -100,8 +98,8 @@ public class BlockGeneric {
     }
 
     @ZenMethod
-    public static BlockGeneric createCrop(String name, IItemStack seed, IItemStack crop, @Optional int cropMinDrop) {
-        return new BlockGeneric(createBlock(new BlockGenericCrop(CraftTweakerMC.getItemStack(seed), CraftTweakerMC.getItemStack(crop), cropMinDrop), name));
+    public static BlockGeneric createCrop(String name, String crop, @Optional int meta, @Optional int cropMinDrop) {
+        return new BlockGeneric(createBlock(new BlockGenericCrop(crop, meta, cropMinDrop), name));
     }
 
     @ZenMethod

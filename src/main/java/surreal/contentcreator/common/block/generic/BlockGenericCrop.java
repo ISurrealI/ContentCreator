@@ -1,16 +1,22 @@
 package surreal.contentcreator.common.block.generic;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockCrops;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemSeeds;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.registry.GameRegistry;
+import surreal.contentcreator.ContentCreator;
 import surreal.contentcreator.types.CTSoundType;
 
+import java.util.List;
 import java.util.Random;
 
 @SuppressWarnings("all")
@@ -18,58 +24,38 @@ public class BlockGenericCrop extends BlockCrops implements IGenericBlock {
     private ItemStack s, c;
     private int cMin;
 
-    public BlockGenericCrop(ItemStack s, ItemStack c, int cMin) {
-        this.s = s;
-        this.c = c;
-        this.cMin = Math.max(cMin, 0);
+    public BlockGenericCrop(String c, int meta, int cMin) {
+        this.c = GameRegistry.makeItemStack(c, meta, 1, null);
+        this.cMin = Math.max(cMin, 1);
     }
 
     @Override
     public void getDrops(NonNullList<ItemStack> drops, IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
-        super.getDrops(drops, world, pos, state, 0);
         int age = getAge(state);
         Random rand = world instanceof World ? ((World)world).rand : new Random();
 
-        if (age >= getMaxAge())
-        {
-            int k = 3 + fortune;
-
-            for (int i = 0; i < 3 + fortune; ++i)
-            {
-                if (rand.nextInt(2 * getMaxAge()) <= age)
-                {
-                    drops.add(s);
-                }
+        if (age >= getMaxAge()) {
+            for (int i = 0; i < rand.nextInt(cMin) + 1; i++) {
+                ContentCreator.getLogger().info("Adding " + c.getItem().getRegistryName() + " to drops.");
+                drops.add(c);
             }
         }
+
+        drops.add(s);
     }
 
     @Override
     public void dropBlockAsItemWithChance(World worldIn, BlockPos pos, IBlockState state, float chance, int fortune) {
-        super.dropBlockAsItemWithChance(worldIn, pos, state, chance, fortune);
-
-        if (false && !worldIn.isRemote) // Forge: NOP all this.
+        if (!worldIn.isRemote && !worldIn.restoringBlockSnapshots) // do not drop items while restoring blockstates, prevents item dupe
         {
-            int i = this.getAge(state);
+            List<ItemStack> drops = getDrops(worldIn, pos, state, fortune); // use the old method until it gets removed, for backward compatibility
+            chance = net.minecraftforge.event.ForgeEventFactory.fireBlockHarvesting(drops, worldIn, pos, state, fortune, chance, false, harvesters.get());
 
-            if (i >= this.getMaxAge())
-            {
-                int j = 3 + fortune;
-
-                for (int k = 0; k < j; ++k)
-                {
-                    if (worldIn.rand.nextInt(2 * this.getMaxAge()) <= i)
-                    {
-                        spawnAsEntity(worldIn, pos, s);
-                    }
-                }
+            for (ItemStack drop : drops) {
+                if (worldIn.rand.nextFloat() <= chance)
+                    spawnAsEntity(worldIn, pos, drop);
             }
         }
-    }
-
-    @Override
-    public int quantityDropped(IBlockState state, int fortune, Random random) {
-        return this.isMaxAge(state) ? cMin + random.nextInt(c.getCount()) : 1;
     }
 
     @Override
@@ -100,5 +86,12 @@ public class BlockGenericCrop extends BlockCrops implements IGenericBlock {
     @Override
     public void setSoundType(CTSoundType soundType) {
         setSoundType(soundType.getType());
+    }
+
+    @Override
+    public Item createItem(Block block) {
+        Item seeds = new ItemSeeds(block, Blocks.FARMLAND).setRegistryName(block.getRegistryName()).setUnlocalizedName(block.getUnlocalizedName());
+        this.s = new ItemStack(seeds);
+        return seeds;
     }
 }
