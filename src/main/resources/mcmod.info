@@ -1,14 +1,12 @@
 [
-{
-  "modid": "contentcreator",
-  "name": "Content Creator",
-  "description": "A mod to create items, blocks, fluids etc. with crafttweaker",
-  "version": "1.0",
-  "mcversion": "1.12.2",
-  "url": "https://github.com/ISurrealI/ContentCreator",
-  "authorList": ["Surreal"],
-  "logoFile": "",
-  "screenshots": [],
-  "dependencies": ["crafttweaker"]
-}
+  {
+    "modid": "contentcreator",
+    "name": "Content Creator",
+    "version": "${version}",
+    "mcversion": "1.12.2",
+    "description": "A mod for creating items, blocks, fluids etc. with crafttweaker",
+    "url": "https://github.com/ISurrealI/ContentCreator",
+    "authorList": ["Surreal"],
+    "logoFile": ""
+  }
 ]

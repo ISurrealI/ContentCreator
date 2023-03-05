@@ -1,38 +1,42 @@
 package surreal.contentcreator;
 
-import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraft.block.Block;
+import net.minecraft.item.Item;
+import net.minecraft.util.SoundEvent;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLConstructionEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import surreal.contentcreator.proxy.CommonProxy;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import surreal.contentcreator.crafttweaker.CTHelper;
+import surreal.contentcreator.crafttweaker.RegistryManager;
 
-import static surreal.contentcreator.ModValues.*;
-
-@Mod(modid = MODID, name = NAME, version = VERSION, dependencies = "required-after:crafttweaker;after:applecore")
+@Mod(modid = ContentCreator.MODID, name = "@MODNAME@", version = "@MODVERSION@", dependencies = "after:crafttweaker")
 public class ContentCreator {
-    private static final Logger LOGGER = LogManager.getLogger(MODID);
 
-    static {
-        if (!FluidRegistry.isUniversalBucketEnabled()) FluidRegistry.enableUniversalBucket();
-    }
+    public static final String MODID = "@MODID@";
 
-    @SidedProxy(serverSide = "surreal.contentcreator.proxy.CommonProxy", clientSide = "surreal.contentcreator.proxy.ClientProxy")
-    public static CommonProxy PROXY;
-
-    public static Logger getLogger() {
-        return LOGGER;
+    @Mod.EventHandler
+    public void construction(FMLConstructionEvent event) {
+        if (Loader.isModLoaded("crafttweaker")) MinecraftForge.EVENT_BUS.register(this);
     }
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        PROXY.preInit(event);
+
+        // Integration
+        if (Loader.isModLoaded("crafttweaker")) CTHelper.registerCT();
     }
 
-    @Mod.EventHandler
-    public void postInit(FMLPostInitializationEvent event) {
-        PROXY.postInit(event);
-    }
+    // Crafttweaker Events
+    @SubscribeEvent
+    public void registerBlocks(RegistryEvent.Register<Block> event) { RegistryManager.INSTANCE.registerBlocks(event.getRegistry()); }
+
+    @SubscribeEvent
+    public void registerItems(RegistryEvent.Register<Item> event) { RegistryManager.INSTANCE.registerItems(event.getRegistry()); }
+
+    @SubscribeEvent
+    public void registerSounds(RegistryEvent.Register<SoundEvent> event) { RegistryManager.INSTANCE.registerSounds(event.getRegistry()); }
 }
