@@ -128,7 +128,7 @@ public class CommonProxy {
     @SubscribeEvent
     public static void registerRecipes(RegistryEvent.Register<IRecipe> event) {
         for (ItemBase item : ITEMS) {
-            for (int i = 0; i < item.SUBITEMS.size(); i++) {
+            for (int i : item.SUBITEMS.keySet()) {
                 SubItem value = item.SUBITEMS.get(i);
 
                 if (value.oreList != null) {

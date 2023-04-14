@@ -147,7 +147,7 @@ public class ClientProxy extends CommonProxy {
         registerMappers();
 
         for (ItemBase item : CommonProxy.ITEMS) {
-            for (int i = 0; i < item.SUBITEMS.size(); i++) {
+            for (int i : item.SUBITEMS.keySet()) {
                 ModelLoader.setCustomModelResourceLocation(item, i, new ModelResourceLocation(item.getModelLocation(i)));
             }
         }

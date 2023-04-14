@@ -42,7 +42,7 @@ public class CTUtil {
             String itemName = Objects.requireNonNull(item.getRegistryName()).getResourcePath();
 
             if (item.SUBITEMS.size() > 1) {
-                for (int meta = 0; meta < Math.min(item.SUBITEMS.size(), Short.MAX_VALUE-1); meta++) {
+                for (int meta : item.SUBITEMS.keySet()) {
                     SubItem subItem = item.SUBITEMS.get(meta);
                     String name = subItem.UNLOCNAME != null ? subItem.UNLOCNAME.getUnlocalizedName(CraftTweakerMC.getIItemStack(new ItemStack(item, 1, meta))) : "" + meta;
                     map.put(itemName + ":" + name, new ItemStack(item, 1, meta));

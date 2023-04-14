@@ -42,6 +42,7 @@ import squeek.applecore.api.food.FoodValues;
 import squeek.applecore.api.food.IEdible;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
+import surreal.contentcreator.ContentCreator;
 import surreal.contentcreator.ModValues;
 import surreal.contentcreator.functions.item.IItemPropertyFunc;
 import surreal.contentcreator.proxy.CommonProxy;
@@ -65,6 +66,7 @@ public class ItemBase extends Item implements IEdible, IHaloItem {
     public ItemBase() {
         SUBITEMS = new Int2ObjectOpenHashMap<>();
         this.setCreativeTab(CreativeTabs.SEARCH);
+        this.setUnlocalizedName("");
     }
 
     @ZenMethod
@@ -118,15 +120,17 @@ public class ItemBase extends Item implements IEdible, IHaloItem {
 
     @ZenMethod
     public SubItem getItem(int meta) {
-        if (meta >= 0 && meta < SUBITEMS.size())
-            return SUBITEMS.get(meta);
+        if (meta < 0) return null;
 
-        return sub(meta);
+        SubItem sub = SUBITEMS.get(meta);
+
+        if (sub != null) return sub;
+        else return sub(meta);
     }
 
     @ZenMethod
     public boolean hasItem(int meta) {
-        return meta >= 0 && meta < SUBITEMS.size();
+        return meta >= 0 && SUBITEMS.containsKey(meta);
     }
 
     @ZenMethod
@@ -141,7 +145,7 @@ public class ItemBase extends Item implements IEdible, IHaloItem {
 
     @ZenMethod
     public void register() {
-        if (SUBITEMS.size() <= 0) SUBITEMS.put(0, new SubItem(0));
+        if (SUBITEMS.size() == 0) SUBITEMS.put(0, new SubItem(0));
         else {
             for (SubItem subItem : SUBITEMS.values()) {
                 Map<ResourceLocation, IItemPropertyFunc> props = subItem.itemProperties;
@@ -162,9 +166,9 @@ public class ItemBase extends Item implements IEdible, IHaloItem {
     public String getModelLocation(int meta) {
         SubItem subItem = SUBITEMS.get(meta);
         String model = !this.modelBlockState ? this.getRegistryName().getResourceDomain() + ":" : this.getRegistryName().getResourceDomain() + ":item/" + this.getRegistryName().getResourcePath();
-        String variant = "" + meta;
-        if (subItem.UNLOCNAME != null) variant = subItem.UNLOCNAME.getUnlocalizedName(CraftTweakerMC.getIItemStack(new ItemStack(this, 1, meta)));
-        model += this.modelBlockState ? "#type=" + variant : (meta == 0 && subItem.UNLOCNAME == null ? this.getRegistryName().getResourcePath() : variant) + "#inventory";
+        String variant = this.getRegistryName().getResourcePath() + "." + meta;
+        if (subItem != null && subItem.UNLOCNAME != null) variant = subItem.UNLOCNAME.getUnlocalizedName(CraftTweakerMC.getIItemStack(new ItemStack(this, 1, meta)));
+        model += this.modelBlockState ? "#type=" + variant : variant + "#inventory";
 
         return model;
     }
@@ -186,7 +190,7 @@ public class ItemBase extends Item implements IEdible, IHaloItem {
     @Override
     public String getUnlocalizedName(@Nonnull ItemStack stack) {
         SubItem subItem = get(stack);
-        return subItem.UNLOCNAME != null ? "item." + ModValues.MODID + "." + subItem.UNLOCNAME.getUnlocalizedName(CraftTweakerMC.getIItemStack(stack)) : this.getUnlocalizedName() + (SUBITEMS.size() > 1 ? "." + stack.getMetadata() : "");
+        return subItem != null && subItem.UNLOCNAME != null ? "item." + ModValues.MODID + "." + subItem.UNLOCNAME.getUnlocalizedName(CraftTweakerMC.getIItemStack(stack)) : this.getUnlocalizedName() + (SUBITEMS.size() > 1 ? "." + stack.getMetadata() : "");
     }
 
     @Nonnull
@@ -194,42 +198,42 @@ public class ItemBase extends Item implements IEdible, IHaloItem {
     public EnumActionResult onItemUse(@Nonnull EntityPlayer player, @Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull EnumHand hand, @Nonnull EnumFacing facing, float hitX, float hitY, float hitZ) {
         ItemStack stack = player.getHeldItem(hand);
         SubItem subItem = get(stack);
-        if (subItem.ITEMUSE != null) return EnumActionResult.valueOf(subItem.ITEMUSE.onItemUse(CraftTweakerMC.getIPlayer(player), CraftTweakerMC.getIWorld(worldIn), CraftTweakerMC.getIBlockPos(pos), CTUtil.getHandEquipment(hand), CraftTweakerMC.getIFacing(facing), hitX, hitY, hitZ).toUpperCase());
+        if (subItem != null && subItem.ITEMUSE != null) return EnumActionResult.valueOf(subItem.ITEMUSE.onItemUse(CraftTweakerMC.getIPlayer(player), CraftTweakerMC.getIWorld(worldIn), CraftTweakerMC.getIBlockPos(pos), CTUtil.getHandEquipment(hand), CraftTweakerMC.getIFacing(facing), hitX, hitY, hitZ).toUpperCase());
         else return super.onItemUse(player, worldIn, pos, hand, facing, hitX, hitY, hitZ);
     }
 
     @Override
     public float getDestroySpeed(@Nonnull ItemStack stack, @Nonnull IBlockState state) {
         SubItem subItem = get(stack);
-        if (subItem.DESTROYSPEED != null) return subItem.DESTROYSPEED.getDestroySpeed(CraftTweakerMC.getIItemStack(stack), CraftTweakerMC.getBlockState(state));
+        if (subItem != null && subItem.DESTROYSPEED != null) return subItem.DESTROYSPEED.getDestroySpeed(CraftTweakerMC.getIItemStack(stack), CraftTweakerMC.getBlockState(state));
         else return super.getDestroySpeed(stack, state);
     }
 
     @Override
     public float getXpRepairRatio(@Nonnull ItemStack stack) {
         SubItem subItem = get(stack);
-        if (subItem.XPREPAIR != null) return subItem.XPREPAIR.getFloat(CraftTweakerMC.getIItemStack(stack));
+        if (subItem != null && subItem.XPREPAIR != null) return subItem.XPREPAIR.getFloat(CraftTweakerMC.getIItemStack(stack));
         else return super.getXpRepairRatio(stack);
     }
 
     @Override
     public boolean onBlockStartBreak(@Nonnull ItemStack itemstack, @Nonnull BlockPos pos, @Nonnull EntityPlayer player) {
         SubItem subItem = get(itemstack);
-        if (subItem.BLOCKSTARTBREAK != null) return subItem.BLOCKSTARTBREAK.onBlockStartBreak(CraftTweakerMC.getIItemStackMutable(itemstack), CraftTweakerMC.getIBlockPos(pos), CraftTweakerMC.getIPlayer(player));
+        if (subItem != null && subItem.BLOCKSTARTBREAK != null) return subItem.BLOCKSTARTBREAK.onBlockStartBreak(CraftTweakerMC.getIItemStackMutable(itemstack), CraftTweakerMC.getIBlockPos(pos), CraftTweakerMC.getIPlayer(player));
         else return super.onBlockStartBreak(itemstack, pos, player);
     }
 
     @Override
     public void onUsingTick(@Nonnull ItemStack stack, @Nonnull EntityLivingBase player, int count) {
         SubItem subItem = get(stack);
-        if (subItem.USINGTICK != null) subItem.USINGTICK.onUsingTick(CraftTweakerMC.getIItemStackMutable(stack), CraftTweakerMC.getIEntityLivingBase(player), count);
+        if (subItem != null && subItem.USINGTICK != null) subItem.USINGTICK.onUsingTick(CraftTweakerMC.getIItemStackMutable(stack), CraftTweakerMC.getIEntityLivingBase(player), count);
         else super.onUsingTick(stack, player, count);
     }
 
     @Override
     public boolean onLeftClickEntity(@Nonnull ItemStack stack, @Nonnull EntityPlayer player, @Nonnull Entity entity) {
         SubItem subItem = get(stack);
-        if (subItem.LEFTCLICKENTITY != null) return subItem.LEFTCLICKENTITY.onLeftClickEntity(CraftTweakerMC.getIItemStackMutable(stack), CraftTweakerMC.getIPlayer(player), CraftTweakerMC.getIEntity(entity));
+        if (subItem != null && subItem.LEFTCLICKENTITY != null) return subItem.LEFTCLICKENTITY.onLeftClickEntity(CraftTweakerMC.getIItemStackMutable(stack), CraftTweakerMC.getIPlayer(player), CraftTweakerMC.getIEntity(entity));
         else return super.onLeftClickEntity(stack, player, entity);
     }
 
@@ -237,28 +241,28 @@ public class ItemBase extends Item implements IEdible, IHaloItem {
     @Override
     public ItemStack getContainerItem(@Nonnull ItemStack itemStack) {
         SubItem subItem = get(itemStack);
-        if (subItem.CONTAINERITEM != null) return CraftTweakerMC.getItemStack(subItem.CONTAINERITEM.getContainerItem(CraftTweakerMC.getIItemStack(itemStack)));
+        if (subItem != null && subItem.CONTAINERITEM != null) return CraftTweakerMC.getItemStack(subItem.CONTAINERITEM.getContainerItem(CraftTweakerMC.getIItemStack(itemStack)));
         else return super.getContainerItem(itemStack);
     }
 
     @Override
     public int getEntityLifespan(@Nonnull ItemStack itemStack, @Nonnull World world) {
         SubItem subItem = get(itemStack);
-        if (subItem.ENTITYLIFESPAN != null) return subItem.ENTITYLIFESPAN.getEntityLifespane(CraftTweakerMC.getIItemStack(itemStack), CraftTweakerMC.getIWorld(world));
+        if (subItem != null && subItem.ENTITYLIFESPAN != null) return subItem.ENTITYLIFESPAN.getEntityLifespane(CraftTweakerMC.getIItemStack(itemStack), CraftTweakerMC.getIWorld(world));
         else return super.getEntityLifespan(itemStack, world);
     }
 
     @Override
     public int getItemEnchantability(@Nonnull ItemStack stack) {
         SubItem subItem = get(stack);
-        if (subItem.ENCHANTABILITY != null) return subItem.ENCHANTABILITY.getInt(CraftTweakerMC.getIItemStack(stack));
+        if (subItem != null && subItem.ENCHANTABILITY != null) return subItem.ENCHANTABILITY.getInt(CraftTweakerMC.getIItemStack(stack));
         else return super.getItemEnchantability(stack);
     }
 
     @Override
     public boolean canApplyAtEnchantingTable(@Nonnull ItemStack stack, @Nonnull Enchantment enchantment) {
         SubItem subItem = get(stack);
-        if (subItem.APPLYENCHTABLE != null) return subItem.APPLYENCHTABLE.canApplyAtEnchantingTable(CraftTweakerMC.getIItemStack(stack), CTUtil.getEnchantment(enchantment));
+        if (subItem != null && subItem.APPLYENCHTABLE != null) return subItem.APPLYENCHTABLE.canApplyAtEnchantingTable(CraftTweakerMC.getIItemStack(stack), CTUtil.getEnchantment(enchantment));
         else return super.canApplyAtEnchantingTable(stack, enchantment);
     }
 
@@ -266,7 +270,7 @@ public class ItemBase extends Item implements IEdible, IHaloItem {
     @Override
     public Entity createEntity(@Nonnull World world, @Nonnull Entity location, @Nonnull ItemStack itemstack) {
         SubItem subItem = get(itemstack);
-        if (subItem.CUSTOMENTITY != null) return CraftTweakerMC.getEntity(subItem.CUSTOMENTITY.createEntity(CraftTweakerMC.getIWorld(world), (IEntityItem) CraftTweakerMC.getIEntity(location), CraftTweakerMC.getIItemStack(itemstack)));
+        if (subItem != null && subItem.CUSTOMENTITY != null) return CraftTweakerMC.getEntity(subItem.CUSTOMENTITY.createEntity(CraftTweakerMC.getIWorld(world), (IEntityItem) CraftTweakerMC.getIEntity(location), CraftTweakerMC.getIItemStack(itemstack)));
         else return super.createEntity(world, location, itemstack);
     }
 
@@ -278,105 +282,105 @@ public class ItemBase extends Item implements IEdible, IHaloItem {
     @Override
     public boolean onEntityItemUpdate(@Nonnull EntityItem entityItem) {
         SubItem subItem = get(entityItem.getItem());
-        if (subItem.ENTITYUPDATE != null) return subItem.ENTITYUPDATE.onEntityItemUpdate(new CTUtil.MCEntityItemMutable(entityItem));
+        if (subItem != null && subItem.ENTITYUPDATE != null) return subItem.ENTITYUPDATE.onEntityItemUpdate(new CTUtil.MCEntityItemMutable(entityItem));
         else return super.onEntityItemUpdate(entityItem);
     }
 
     @Override
     public boolean onEntitySwing(@Nonnull EntityLivingBase entityLiving, @Nonnull ItemStack stack) {
         SubItem subItem = get(stack);
-        if (subItem.ENTITYSWING != null) return subItem.ENTITYSWING.onEntitySwing(CraftTweakerMC.getIEntityLivingBase(entityLiving), CraftTweakerMC.getIItemStackMutable(stack));
+        if (subItem != null && subItem.ENTITYSWING != null) return subItem.ENTITYSWING.onEntitySwing(CraftTweakerMC.getIEntityLivingBase(entityLiving), CraftTweakerMC.getIItemStackMutable(stack));
         else return super.onEntitySwing(entityLiving, stack);
     }
 
     @Override
     public int getDamage(@Nonnull ItemStack stack) {
         SubItem subItem = get(stack);
-        if (subItem.ITEMDAMAGE != null) return subItem.ITEMDAMAGE.getInt(CraftTweakerMC.getIItemStack(stack));
+        if (subItem != null && subItem.ITEMDAMAGE != null) return subItem.ITEMDAMAGE.getInt(CraftTweakerMC.getIItemStack(stack));
         else return super.getDamage(stack);
     }
 
     @Override
     public boolean showDurabilityBar(@Nonnull ItemStack stack) {
         SubItem subItem = get(stack);
-        if (subItem.SHOWBAR != null) return subItem.SHOWBAR.getBool(CraftTweakerMC.getIItemStack(stack));
+        if (subItem != null && subItem.SHOWBAR != null) return subItem.SHOWBAR.getBool(CraftTweakerMC.getIItemStack(stack));
         else return super.showDurabilityBar(stack);
     }
 
     @Override
     public double getDurabilityForDisplay(@Nonnull ItemStack stack) {
         SubItem subItem = get(stack);
-        if (subItem.DURABILITYDISPLAY != null) return subItem.DURABILITYDISPLAY.getDouble(CraftTweakerMC.getIItemStack(stack));
+        if (subItem != null && subItem.DURABILITYDISPLAY != null) return subItem.DURABILITYDISPLAY.getDouble(CraftTweakerMC.getIItemStack(stack));
         else return super.getDurabilityForDisplay(stack);
     }
 
     @Override
     public int getRGBDurabilityForDisplay(@Nonnull ItemStack stack) {
         SubItem subItem = get(stack);
-        if (subItem.COLORDISPLAY != null) return subItem.COLORDISPLAY.getInt(CraftTweakerMC.getIItemStack(stack));
+        if (subItem != null && subItem.COLORDISPLAY != null) return subItem.COLORDISPLAY.getInt(CraftTweakerMC.getIItemStack(stack));
         else return super.getRGBDurabilityForDisplay(stack);
     }
 
     @Override
     public int getMaxDamage(@Nonnull ItemStack stack) {
         SubItem subItem = get(stack);
-        if (subItem.MAXDAMAGE != null) return subItem.MAXDAMAGE.getInt(CraftTweakerMC.getIItemStack(stack));
+        if (subItem != null && subItem.MAXDAMAGE != null) return subItem.MAXDAMAGE.getInt(CraftTweakerMC.getIItemStack(stack));
         else return super.getMaxDamage(stack);
     }
 
     @Override
     public void setDamage(@Nonnull ItemStack stack, int damage) {
         SubItem subItem = get(stack);
-        if (subItem.SETDAMAGE != null) subItem.SETDAMAGE.setDamage(CraftTweakerMC.getIItemStackMutable(stack), damage);
+        if (subItem != null && subItem.SETDAMAGE != null) subItem.SETDAMAGE.setDamage(CraftTweakerMC.getIItemStackMutable(stack), damage);
         else super.setDamage(stack, damage);
     }
 
     @Override
     public boolean canDestroyBlockInCreative(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull ItemStack stack, @Nonnull EntityPlayer player) {
         SubItem subItem = get(stack);
-        if (subItem.DESTROYCREATIVE != null) return subItem.DESTROYCREATIVE.canDestroyBlockInCreative(CraftTweakerMC.getIWorld(world), CraftTweakerMC.getIBlockPos(pos), CraftTweakerMC.getIItemStack(stack), CraftTweakerMC.getIPlayer(player));
+        if (subItem != null && subItem.DESTROYCREATIVE != null) return subItem.DESTROYCREATIVE.canDestroyBlockInCreative(CraftTweakerMC.getIWorld(world), CraftTweakerMC.getIBlockPos(pos), CraftTweakerMC.getIItemStack(stack), CraftTweakerMC.getIPlayer(player));
         else return super.canDestroyBlockInCreative(world, pos, stack, player);
     }
 
     @Override
     public boolean canHarvestBlock(@Nonnull IBlockState state, @Nonnull ItemStack stack) {
         SubItem subItem = get(stack);
-        if (subItem.HARVESTBLOCK != null) return subItem.HARVESTBLOCK.canHarvestBlock(CraftTweakerMC.getBlockState(state), CraftTweakerMC.getIItemStack(stack));
+        if (subItem != null && subItem.HARVESTBLOCK != null) return subItem.HARVESTBLOCK.canHarvestBlock(CraftTweakerMC.getBlockState(state), CraftTweakerMC.getIItemStack(stack));
         else return super.canHarvestBlock(state, stack);
     }
 
     @Override
     public int getItemStackLimit(@Nonnull ItemStack stack) {
         SubItem subItem = get(stack);
-        if (subItem.STACKLIMIT != null) return subItem.STACKLIMIT.getInt(CraftTweakerMC.getIItemStack(stack));
+        if (subItem != null && subItem.STACKLIMIT != null) return subItem.STACKLIMIT.getInt(CraftTweakerMC.getIItemStack(stack));
         else return super.getItemStackLimit(stack);
     }
 
     @Override
     public boolean isBeaconPayment(@Nonnull ItemStack stack) {
         SubItem subItem = get(stack);
-        if (subItem.BEACONPAYMENT != null) return subItem.BEACONPAYMENT.getBool(CraftTweakerMC.getIItemStack(stack));
+        if (subItem != null && subItem.BEACONPAYMENT != null) return subItem.BEACONPAYMENT.getBool(CraftTweakerMC.getIItemStack(stack));
         else return super.isBeaconPayment(stack);
     }
 
     @Override
     public boolean shouldCauseReequipAnimation(@Nonnull ItemStack oldStack, @Nonnull ItemStack newStack, boolean slotChanged) {
         SubItem subItem = get(oldStack);
-        if (subItem.REEQUIP != null) return subItem.REEQUIP.shouldCauseReequipAnimation(CraftTweakerMC.getIItemStack(oldStack), CraftTweakerMC.getIItemStack(newStack), slotChanged);
+        if (subItem != null && subItem.REEQUIP != null) return subItem.REEQUIP.shouldCauseReequipAnimation(CraftTweakerMC.getIItemStack(oldStack), CraftTweakerMC.getIItemStack(newStack), slotChanged);
         else return super.shouldCauseReequipAnimation(oldStack, newStack, slotChanged);
     }
 
     @Override
     public boolean shouldCauseBlockBreakReset(@Nonnull ItemStack oldStack, @Nonnull ItemStack newStack) {
         SubItem subItem = get(oldStack);
-        if (subItem.BREAKRESET != null) return subItem.BREAKRESET.shouldCauseBlockBreakReset(CraftTweakerMC.getIItemStack(oldStack), CraftTweakerMC.getIItemStack(newStack));
+        if (subItem != null && subItem.BREAKRESET != null) return subItem.BREAKRESET.shouldCauseBlockBreakReset(CraftTweakerMC.getIItemStack(oldStack), CraftTweakerMC.getIItemStack(newStack));
         else return super.shouldCauseBlockBreakReset(oldStack, newStack);
     }
 
     @Override
     public boolean canContinueUsing(@Nonnull ItemStack oldStack, @Nonnull ItemStack newStack) {
         SubItem subItem = get(oldStack);
-        if (subItem.CONTINUEUSING != null) return subItem.CONTINUEUSING.canContinueUsing(CraftTweakerMC.getIItemStack(oldStack), CraftTweakerMC.getIItemStack(newStack));
+        if (subItem != null && subItem.CONTINUEUSING != null) return subItem.CONTINUEUSING.canContinueUsing(CraftTweakerMC.getIItemStack(oldStack), CraftTweakerMC.getIItemStack(newStack));
         else return super.canContinueUsing(oldStack, newStack);
     }
 
@@ -384,14 +388,14 @@ public class ItemBase extends Item implements IEdible, IHaloItem {
     @Override
     public String getCreatorModId(@Nonnull ItemStack itemStack) {
         SubItem subItem = get(itemStack);
-        if (subItem.CREATORMODID != null) CraftTweakerAPI.logWarning("You cannot change mod id!");
+        if (subItem != null && subItem.CREATORMODID != null) CraftTweakerAPI.logWarning("You cannot change mod id!");
         return super.getCreatorModId(itemStack);
     }
 
     @Override
     public boolean canDisableShield(@Nonnull ItemStack stack, @Nonnull ItemStack shield, @Nonnull EntityLivingBase entity, @Nonnull EntityLivingBase attacker) {
         SubItem subItem = get(stack);
-        if (subItem.DISABLESHIED != null) return subItem.DISABLESHIED.canDisableShield(CraftTweakerMC.getIItemStack(stack), CraftTweakerMC.getIItemStack(shield), CraftTweakerMC.getIEntityLivingBase(entity), CraftTweakerMC.getIEntityLivingBase(attacker));
+        if (subItem != null && subItem.DISABLESHIED != null) return subItem.DISABLESHIED.canDisableShield(CraftTweakerMC.getIItemStack(stack), CraftTweakerMC.getIItemStack(shield), CraftTweakerMC.getIEntityLivingBase(entity), CraftTweakerMC.getIEntityLivingBase(attacker));
         else return super.canDisableShield(stack, shield, entity, attacker);
     }
 
@@ -399,14 +403,14 @@ public class ItemBase extends Item implements IEdible, IHaloItem {
     @SideOnly(Side.CLIENT)
     public void addInformation(@Nonnull ItemStack stack, @Nullable World worldIn, @Nonnull List<String> tooltip, @Nonnull ITooltipFlag flagIn) {
         SubItem subItem = get(stack);
-        if (subItem.INFO != null) Collections.addAll(tooltip, subItem.INFO.addInformation(CraftTweakerMC.getIItemStack(stack), CraftTweakerMC.getIWorld(worldIn), flagIn.isAdvanced()));
+        if (subItem != null && subItem.INFO != null) Collections.addAll(tooltip, subItem.INFO.addInformation(CraftTweakerMC.getIItemStack(stack), CraftTweakerMC.getIWorld(worldIn), flagIn.isAdvanced()));
         else super.addInformation(stack, worldIn, tooltip, flagIn);
     }
 
     @Override
     public int getItemBurnTime(@Nonnull ItemStack itemStack) {
         SubItem subItem = get(itemStack);
-        if (subItem.BURNTIME != null) return subItem.BURNTIME.getInt(CraftTweakerMC.getIItemStack(itemStack));
+        if (subItem != null && subItem.BURNTIME != null) return subItem.BURNTIME.getInt(CraftTweakerMC.getIItemStack(itemStack));
         else return super.getItemBurnTime(itemStack);
     }
 
@@ -415,14 +419,14 @@ public class ItemBase extends Item implements IEdible, IHaloItem {
     public IRarity getForgeRarity(@Nonnull ItemStack stack) {
         SubItem subItem = get(stack);
 
-        if (subItem.RARITY != null) return CTUtil.getRarity(subItem.RARITY.getString(CraftTweakerMC.getIItemStack(stack)));
+        if (subItem != null && subItem != null && subItem.RARITY != null) return CTUtil.getRarity(subItem.RARITY.getString(CraftTweakerMC.getIItemStack(stack)));
         else return super.getForgeRarity(stack);
     }
 
     @Override
     public boolean hasEffect(@Nonnull ItemStack stack) {
         SubItem subItem = get(stack);
-        if (subItem.EFFECT != null) return subItem.EFFECT.getBool(CraftTweakerMC.getIItemStack(stack));
+        if (subItem != null && subItem.EFFECT != null) return subItem.EFFECT.getBool(CraftTweakerMC.getIItemStack(stack));
         else return super.hasEffect(stack);
     }
 
@@ -430,14 +434,14 @@ public class ItemBase extends Item implements IEdible, IHaloItem {
     @Override
     public EnumAction getItemUseAction(@Nonnull ItemStack stack) {
         SubItem subItem = get(stack);
-        if (subItem.ACTION != null) return CTUtil.getAction(subItem.ACTION.getString(CraftTweakerMC.getIItemStack(stack)));
+        if (subItem != null && subItem.ACTION != null) return CTUtil.getAction(subItem.ACTION.getString(CraftTweakerMC.getIItemStack(stack)));
         else return super.getItemUseAction(stack);
     }
 
     @Override
     public int getMaxItemUseDuration(@Nonnull ItemStack stack) {
         SubItem subItem = get(stack);
-        if (subItem.MAXUSEDURATION != null) return subItem.MAXUSEDURATION.getInt(CraftTweakerMC.getIItemStack(stack));
+        if (subItem != null && subItem.MAXUSEDURATION != null) return subItem.MAXUSEDURATION.getInt(CraftTweakerMC.getIItemStack(stack));
         else return super.getMaxItemUseDuration(stack);
     }
 
@@ -447,7 +451,7 @@ public class ItemBase extends Item implements IEdible, IHaloItem {
         ItemStack stack = playerIn.getHeldItem(handIn);
         SubItem subItem = get(stack);
         if (playerIn.canEat(this.isAlwaysEatable(stack))) playerIn.setActiveHand(handIn);
-        if (subItem.RIGHTCLICK != null) return ActionResult.newResult(EnumActionResult.valueOf(subItem.RIGHTCLICK.onItemRightClick(CraftTweakerMC.getIWorld(worldIn), CraftTweakerMC.getIPlayer(playerIn), CTUtil.getHandEquipment(handIn))), stack);
+        if (subItem != null && subItem.RIGHTCLICK != null) return ActionResult.newResult(EnumActionResult.valueOf(subItem.RIGHTCLICK.onItemRightClick(CraftTweakerMC.getIWorld(worldIn), CraftTweakerMC.getIPlayer(playerIn), CTUtil.getHandEquipment(handIn))), stack);
         else return super.onItemRightClick(worldIn, playerIn, handIn);
     }
 
@@ -456,7 +460,7 @@ public class ItemBase extends Item implements IEdible, IHaloItem {
     public EnumActionResult onItemUseFirst(@Nonnull EntityPlayer player, @Nonnull World world, @Nonnull BlockPos pos, @Nonnull EnumFacing side, float hitX, float hitY, float hitZ, @Nonnull EnumHand hand) {
         ItemStack stack = player.getHeldItem(hand);
         SubItem subItem = get(stack);
-        if (subItem.ITEMUSEFIRST != null) return EnumActionResult.valueOf(subItem.ITEMUSEFIRST.onItemUse(CraftTweakerMC.getIPlayer(player), CraftTweakerMC.getIWorld(world), CraftTweakerMC.getIBlockPos(pos), CTUtil.getHandEquipment(hand), CraftTweakerMC.getIFacing(side), hitX, hitY, hitZ).toUpperCase());
+        if (subItem != null && subItem.ITEMUSEFIRST != null) return EnumActionResult.valueOf(subItem.ITEMUSEFIRST.onItemUse(CraftTweakerMC.getIPlayer(player), CraftTweakerMC.getIWorld(world), CraftTweakerMC.getIBlockPos(pos), CTUtil.getHandEquipment(hand), CraftTweakerMC.getIFacing(side), hitX, hitY, hitZ).toUpperCase());
         else return super.onItemUseFirst(player, world, pos, side, hitX, hitY, hitZ, hand);
     }
 
@@ -474,7 +478,7 @@ public class ItemBase extends Item implements IEdible, IHaloItem {
             stack.shrink(1);
         }
 
-        if (subItem.ITEMUSEFINISH != null) return CraftTweakerMC.getItemStack(subItem.ITEMUSEFINISH.onItemUseFinish(CraftTweakerMC.getIItemStackMutable(stack), CraftTweakerMC.getIWorld(worldIn), CraftTweakerMC.getIEntityLivingBase(entityLiving)));
+        if (subItem != null && subItem.ITEMUSEFINISH != null) return CraftTweakerMC.getItemStack(subItem.ITEMUSEFINISH.onItemUseFinish(CraftTweakerMC.getIItemStackMutable(stack), CraftTweakerMC.getIWorld(worldIn), CraftTweakerMC.getIEntityLivingBase(entityLiving)));
         else return super.onItemUseFinish(stack, worldIn, entityLiving);
     }
 
@@ -487,14 +491,14 @@ public class ItemBase extends Item implements IEdible, IHaloItem {
             return true;
         }
 
-        if (subItem.ENTITYINTERACTION != null) return subItem.ENTITYINTERACTION.itemInteractionForEntity(CraftTweakerMC.getIItemStackMutable(stack), CraftTweakerMC.getIPlayer(playerIn), CraftTweakerMC.getIEntityLivingBase(target), CTUtil.getHandEquipment(hand));
+        if (subItem != null && subItem.ENTITYINTERACTION != null) return subItem.ENTITYINTERACTION.itemInteractionForEntity(CraftTweakerMC.getIItemStackMutable(stack), CraftTweakerMC.getIPlayer(playerIn), CraftTweakerMC.getIEntityLivingBase(target), CTUtil.getHandEquipment(hand));
         else return super.itemInteractionForEntity(stack, playerIn, target, hand);
     }
 
     @Override
     public boolean hitEntity(@Nonnull ItemStack stack, @Nonnull EntityLivingBase target, @Nonnull EntityLivingBase attacker) {
         SubItem subItem = get(stack);
-        if (subItem.ENTITYHIT != null) return subItem.ENTITYHIT.hitEntity(CraftTweakerMC.getIItemStackMutable(stack), CraftTweakerMC.getIEntityLivingBase(target), CraftTweakerMC.getIEntityLivingBase(attacker));
+        if (subItem != null && subItem.ENTITYHIT != null) return subItem.ENTITYHIT.hitEntity(CraftTweakerMC.getIItemStackMutable(stack), CraftTweakerMC.getIEntityLivingBase(target), CraftTweakerMC.getIEntityLivingBase(attacker));
         else return super.hitEntity(stack, target, attacker);
     }
 
@@ -507,7 +511,7 @@ public class ItemBase extends Item implements IEdible, IHaloItem {
     @Override
     public void onCreated(@Nonnull ItemStack stack, @Nonnull World worldIn, @Nonnull EntityPlayer playerIn) {
         SubItem subItem = get(stack);
-        if (subItem.CREATED != null) subItem.CREATED.onCreated(CraftTweakerMC.getIItemStackMutable(stack), CraftTweakerMC.getIWorld(worldIn), CraftTweakerMC.getIPlayer(playerIn));
+        if (subItem != null && subItem.CREATED != null) subItem.CREATED.onCreated(CraftTweakerMC.getIItemStackMutable(stack), CraftTweakerMC.getIWorld(worldIn), CraftTweakerMC.getIPlayer(playerIn));
         else super.onCreated(stack, worldIn, playerIn);
     }
 
@@ -517,8 +521,8 @@ public class ItemBase extends Item implements IEdible, IHaloItem {
         SubItem subItem = get(stack);
         Multimap<String, AttributeModifier> mm = super.getAttributeModifiers(slot, stack);
 
-        if (subItem.ATTACKDAMAGE != null) mm.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Tool modifier", subItem.ATTACKDAMAGE.getValue(CraftTweakerMC.getIEntityEquipmentSlot(slot)), 0));
-        if (subItem.ATTACKSPEED != null) mm.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Tool modifier", subItem.ATTACKDAMAGE.getValue(CraftTweakerMC.getIEntityEquipmentSlot(slot)), 0));
+        if (subItem != null && subItem.ATTACKDAMAGE != null) mm.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Tool modifier", subItem.ATTACKDAMAGE.getValue(CraftTweakerMC.getIEntityEquipmentSlot(slot)), 0));
+        if (subItem != null && subItem.ATTACKSPEED != null) mm.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Tool modifier", subItem.ATTACKDAMAGE.getValue(CraftTweakerMC.getIEntityEquipmentSlot(slot)), 0));
         return mm;
     }
 
@@ -527,31 +531,31 @@ public class ItemBase extends Item implements IEdible, IHaloItem {
         SubItem subItem = get(stack);
         IItemStack iStack = CraftTweakerMC.getIItemStack(stack);
 
-        if (subItem.MAXDAMAGE != null && subItem.ITEMDAMAGE != null) return subItem.ITEMDAMAGE.getInt(iStack) > 0;
+        if (subItem != null && subItem.MAXDAMAGE != null && subItem.ITEMDAMAGE != null) return subItem.ITEMDAMAGE.getInt(iStack) > 0;
         else return super.isDamaged(stack);
     }
 
     public int getHealAmount(ItemStack stack) {
         SubItem subItem = get(stack);
-        if (subItem.HEALAMOUNT != null) return subItem.HEALAMOUNT.getInt(CraftTweakerMC.getIItemStack(stack));
+        if (subItem != null && subItem.HEALAMOUNT != null) return subItem.HEALAMOUNT.getInt(CraftTweakerMC.getIItemStack(stack));
         else return 0;
     }
 
     public float getSaturation(ItemStack stack) {
         SubItem subItem = get(stack);
-        if (subItem.SATURATION != null) return subItem.SATURATION.getFloat(CraftTweakerMC.getIItemStack(stack));
+        if (subItem != null && subItem.SATURATION != null) return subItem.SATURATION.getFloat(CraftTweakerMC.getIItemStack(stack));
         else return 0F;
     }
 
     public boolean isWolfsFavorite(ItemStack stack) {
         SubItem subItem = get(stack);
-        if (subItem.WOLFSFAVORITE != null) return subItem.WOLFSFAVORITE.getBool(CraftTweakerMC.getIItemStack(stack));
+        if (subItem != null && subItem.WOLFSFAVORITE != null) return subItem.WOLFSFAVORITE.getBool(CraftTweakerMC.getIItemStack(stack));
         else return false;
     }
 
     public boolean isAlwaysEatable(ItemStack stack) {
         SubItem subItem = get(stack);
-        if (subItem.ALWAYSEDIBLE != null) return subItem.ALWAYSEDIBLE.getBool(CraftTweakerMC.getIItemStack(stack));
+        if (subItem != null && subItem.ALWAYSEDIBLE != null) return subItem.ALWAYSEDIBLE.getBool(CraftTweakerMC.getIItemStack(stack));
         else return false;
     }
 
@@ -571,7 +575,7 @@ public class ItemBase extends Item implements IEdible, IHaloItem {
     @Override
     public String getHighlightTip(@Nonnull ItemStack item, @Nonnull String displayName) {
         SubItem subItem = get(item);
-        if (subItem.HIGHLIGHTTIP != null) {
+        if (subItem != null && subItem.HIGHLIGHTTIP != null) {
             String tip = subItem.HIGHLIGHTTIP.getHighlightTip(CraftTweakerMC.getIItemStack(item), displayName);
             if (tip != null) return tip;
         }
@@ -582,7 +586,7 @@ public class ItemBase extends Item implements IEdible, IHaloItem {
     @Override
     public boolean onDroppedByPlayer(@Nonnull ItemStack item, @Nonnull EntityPlayer player) {
         SubItem subItem = get(item);
-        if (subItem.PLAYERDROP != null) return subItem.PLAYERDROP.onDroppedByPlayer(CraftTweakerMC.getIItemStackMutable(item), CraftTweakerMC.getIPlayer(player));
+        if (subItem != null && subItem.PLAYERDROP != null) return subItem.PLAYERDROP.onDroppedByPlayer(CraftTweakerMC.getIItemStackMutable(item), CraftTweakerMC.getIPlayer(player));
         else return super.onDroppedByPlayer(item, player);
     }
 
