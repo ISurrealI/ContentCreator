@@ -7,6 +7,7 @@ import crafttweaker.api.entity.IEntityItem;
 import crafttweaker.api.item.IItemDefinition;
 import crafttweaker.api.item.IItemStack;
 import crafttweaker.api.minecraft.CraftTweakerMC;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.gui.FontRenderer;
@@ -62,13 +63,22 @@ public class ItemBase extends Item implements IEdible, IHaloItem {
     public boolean modelBlockState = false; // for not needing to mass model files
 
     public ItemBase() {
-        SUBITEMS = new HashMap<>();
+        SUBITEMS = new Int2ObjectOpenHashMap<>();
         this.setCreativeTab(CreativeTabs.SEARCH);
     }
 
     @ZenMethod
     public static ItemBase create(String name) {
         return (ItemBase) new ItemBase().setRegistryName(ModValues.MODID, name).setUnlocalizedName(ModValues.MODID + "." + name);
+    }
+
+    @ZenMethod
+    public static ItemBase getItem(String name) {
+        for (ItemBase item : CommonProxy.ITEMS) {
+            if (item.getRegistryName().toString().equals(name)) return item;
+        }
+
+        return null;
     }
 
     @ZenMethod
@@ -83,6 +93,12 @@ public class ItemBase extends Item implements IEdible, IHaloItem {
         Item item = CraftTweakerMC.getItem(definition);
         if (item instanceof ItemBase) return (ItemBase) item;
         return null;
+    }
+
+    @ZenMethod
+    public static SubItem getSubItem(String name, int meta) {
+        ItemBase item = getItem(name);
+        return item != null ? item.getItem(meta) : null;
     }
 
     @ZenMethod
@@ -160,7 +176,7 @@ public class ItemBase extends Item implements IEdible, IHaloItem {
     @Override
     public void getSubItems(@Nonnull CreativeTabs tab, @Nonnull NonNullList<ItemStack> items) {
         if (this.isInCreativeTab(tab)) {
-            for (int i = 0; i < SUBITEMS.size(); i++) {
+            for (int i : SUBITEMS.keySet()) {
                 items.add(new ItemStack(this, 1, i));
             }
         }

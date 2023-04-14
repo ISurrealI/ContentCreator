@@ -1,16 +1,17 @@
 package surreal.contentcreator.common.block.generic;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockStairs;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
 import surreal.contentcreator.types.CTSoundType;
-import surreal.contentcreator.util.GeneralUtil;
 
 public class BlockGenericStairs extends BlockStairs implements IGenericBlock {
     protected BlockGenericStairs(IBlockState modelState) {
         super(modelState);
+        this.useNeighborBrightness = true;
     }
 
     @Override
@@ -33,6 +34,9 @@ public class BlockGenericStairs extends BlockStairs implements IGenericBlock {
 
     @Override
     public void setVariants(Block block, JsonObject variants) {
+        JsonArray emptyArray = new JsonArray();
+        emptyArray.add(new JsonObject());
+
         for (EnumFacing facing : BlockStairs.FACING.getAllowedValues()) {
             for (EnumHalf half : BlockStairs.EnumHalf.values()) {
                 for (EnumShape shape : EnumShape.values()) {
@@ -95,6 +99,6 @@ public class BlockGenericStairs extends BlockStairs implements IGenericBlock {
             }
         }
 
-        
+        variants.add("inventory", emptyArray);
     }
 }

@@ -29,13 +29,16 @@ public class BlockGenericColored extends BlockColored implements IGenericBlock {
 
     @Override
     public void setVariants(Block block, JsonObject variants) {
+        JsonArray emptyArray = new JsonArray();
+        emptyArray.add(new JsonObject());
+
         JsonObject color = new JsonObject();
 
         for (EnumDyeColor c : BlockColored.COLOR.getAllowedValues()) {
-            color.add(c.getDyeColorName(), GeneralUtil.EMPTY_ARRAY);
+            color.add(c.getDyeColorName(), emptyArray);
         }
 
         variants.add("color", color);
-        variants.add("inventory", GeneralUtil.EMPTY_ARRAY);
+        variants.add("inventory", emptyArray);
     }
 }

@@ -16,7 +16,9 @@ import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -33,6 +35,7 @@ import surreal.contentcreator.common.item.ItemMaterial;
 import surreal.contentcreator.functions.item.IItemColorFunc;
 import surreal.contentcreator.types.CTMaterial;
 import surreal.contentcreator.util.CTUtil;
+import surreal.contentcreator.util.FileGenUtil;
 import surreal.contentcreator.util.GeneralUtil;
 import surreal.contentcreator.util.IHaloItem;
 
@@ -61,7 +64,7 @@ public class ClientProxy extends CommonProxy {
     }
 
     private static void registerHaloTextures() {
-        if (!ModValues.AVARITIA) {
+        if (!Loader.isModLoaded("avaritia")) {
             texturesToRegister.add(IHaloItem.getHaloTexture(0));
             texturesToRegister.add(IHaloItem.getHaloTexture(1));
             texturesToRegister.add(IHaloItem.getHaloTexture(2));
@@ -161,12 +164,7 @@ public class ClientProxy extends CommonProxy {
             }
         }
 
-        GeneralUtil.generateItemFiles(ITEMS);
-        GeneralUtil.generateMatItems(MAT_ITEMS.values());
-        GeneralUtil.generateBlocks(BLOCKS);
-        GeneralUtil.generateBlocks(MAT_BLOCKS);
-        GeneralUtil.generateFiles();
-        GeneralUtil.generateFluidFiles(FLUIDS);
+        if (Loader.isModLoaded("resourceloader")) FileGenUtil.generateFiles();
     }
 
     @SubscribeEvent

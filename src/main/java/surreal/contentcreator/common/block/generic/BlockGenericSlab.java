@@ -17,6 +17,7 @@ public abstract class BlockGenericSlab extends BlockSlab implements IGenericBloc
 
     public BlockGenericSlab(Material p_i47249_1_, MapColor p_i47249_2_) {
         super(p_i47249_1_, p_i47249_2_);
+        this.useNeighborBrightness = true;
         if (!this.isDouble())
             this.setDefaultState(getDefaultState().withProperty(HALF, EnumBlockHalf.BOTTOM).withProperty(VARIANT, Type.normal));
     }

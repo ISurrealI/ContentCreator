@@ -9,6 +9,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import stanhebben.zenscript.annotations.Optional;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
@@ -103,8 +104,8 @@ public class BlockGeneric {
     }
 
     @ZenMethod
-    public static BlockGeneric createCocoaCrop(String name, IItemStack crop, @Optional int minDrop) {
-        return new BlockGeneric(createBlock(new BlockGenericCocoa(CraftTweakerMC.getItemStack(crop), minDrop), name));
+    public static BlockGeneric createCocoaCrop(String name, String crop, @Optional int meta, @Optional int minDrop) {
+        return new BlockGeneric(createBlock(new BlockGenericCocoa(new ItemStack(Item.getByNameOrId(crop), 1, meta), minDrop), name));
     }
 
     @ZenMethod

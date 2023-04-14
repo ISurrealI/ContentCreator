@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import crafttweaker.annotations.ZenRegister;
 import crafttweaker.api.block.IBlockStateMatcher;
 import crafttweaker.api.block.IMaterial;
+import crafttweaker.api.item.IItemDefinition;
 import crafttweaker.api.item.IItemStack;
 import crafttweaker.api.minecraft.CraftTweakerMC;
 import crafttweaker.api.util.IAxisAlignedBB;
@@ -25,6 +26,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
@@ -169,6 +171,25 @@ public class BlockBase extends Block {
         if (FACING != null || INT != null) clear();
 
         return base;
+    }
+
+    @ZenMethod
+    public static BlockBase getBlock(String name) {
+        for (Block block : CommonProxy.BLOCKS) {
+            if (block.getRegistryName().toString().equals(name)) return (BlockBase) block;
+        }
+
+        return null;
+    }
+
+    @ZenMethod
+    public static BlockBase getBlock(IItemStack stack) {
+        return (BlockBase) Block.getBlockFromItem(CraftTweakerMC.getItem(stack.getDefinition()));
+    }
+
+    @ZenMethod
+    public static BlockBase getBlock(IItemDefinition definition) {
+        return (BlockBase) Block.getBlockFromItem(CraftTweakerMC.getItem(definition));
     }
 
     @Nonnull

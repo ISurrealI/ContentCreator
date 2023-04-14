@@ -62,16 +62,20 @@ public class BlockGenericDoubleSlab extends BlockGenericSlab {
 
     @Override
     public void setVariants(Block block, JsonObject variants) {
+        JsonObject emptyObject = new JsonObject();
+        JsonArray emptyArray = new JsonArray();
+        emptyArray.add(new JsonObject());
+
         JsonObject half = new JsonObject();
-        half.add("bottom", GeneralUtil.EMPTY_OBJECT);
-        half.add("top", GeneralUtil.EMPTY_OBJECT);
+        half.add("bottom", emptyObject);
+        half.add("top", emptyObject);
 
         variants.add("half", half);
 
         JsonObject variant = new JsonObject();
-        variant.add("normal", GeneralUtil.EMPTY_OBJECT);
+        variant.add("normal", emptyObject);
         variants.add("variant", variant);
 
-        variants.add("inventory", GeneralUtil.EMPTY_ARRAY);
+        variants.add("inventory", emptyArray);
     }
 }

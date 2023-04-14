@@ -6,6 +6,7 @@ import crafttweaker.api.minecraft.CraftTweakerMC;
 import net.minecraft.block.material.Material;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
 import stanhebben.zenscript.annotations.Optional;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
@@ -35,7 +36,6 @@ public class FluidBase extends Fluid {
 
     public FluidBase(String fluidName, ResourceLocation still, ResourceLocation flowing, @Nullable ResourceLocation overlay) {
         super(fluidName, still, flowing, overlay);
-        CommonProxy.FLUIDS.add(this);
         this.setDensity(3000).setViscosity(6000);
     }
 
@@ -50,6 +50,15 @@ public class FluidBase extends Fluid {
         if (!TEXTURES.contains(flow)) TEXTURES.add(flow);
 
         return new FluidBase(name, still, flow, ol);
+    }
+
+    @ZenMethod
+    public static FluidBase getFluid(String name) {
+        for (FluidBase fluid : CommonProxy.FLUIDS) {
+            if (fluid.getName().equals(name)) return fluid;
+        }
+
+        return null;
     }
 
     @ZenMethod
@@ -112,5 +121,18 @@ public class FluidBase extends Fluid {
     @ZenMethod("setColor")
     public FluidBase setCol(int color) {
         return (FluidBase) super.setColor(GeneralUtil.getColorFromInt(color));
+    }
+
+    @ZenMethod
+    public void register() {
+        if (isGaseous && density > 0) {
+            density *= -1;
+        }
+
+        if (!isGaseous && density < 0) {
+            isGaseous = true;
+        }
+
+        CommonProxy.FLUIDS.add(this);
     }
 }

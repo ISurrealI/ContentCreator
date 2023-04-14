@@ -75,12 +75,16 @@ public class BlockGenericPillar extends BlockRotatedPillar implements IGenericBl
 
     @Override
     public void setVariants(Block block, JsonObject variants) {
+        JsonObject emptyObject = new JsonObject();
+        JsonArray emptyArray = new JsonArray();
+        emptyArray.add(new JsonObject());
+
         JsonObject axis = new JsonObject();
 
         for (EnumFacing.Axis a : AXIS.getAllowedValues()) {
-            axis.add(a.getName(), GeneralUtil.EMPTY_OBJECT);
+            axis.add(a.getName(), emptyObject);
         }
         variants.add("axis", axis);
-        variants.add("inventory", GeneralUtil.EMPTY_ARRAY);
+        variants.add("inventory", emptyArray);
     }
 }

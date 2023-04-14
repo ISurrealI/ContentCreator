@@ -1,5 +1,6 @@
 package surreal.contentcreator.common.block.generic;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
@@ -8,7 +9,6 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemSlab;
 import surreal.contentcreator.ModValues;
-import surreal.contentcreator.util.GeneralUtil;
 
 import java.util.List;
 
@@ -21,10 +21,6 @@ public class BlockGenericHalfSlab extends BlockGenericSlab {
         this.setRegistryName(ModValues.MODID, name).setUnlocalizedName(ModValues.MODID + "." + name);
         this.slab = new BlockGenericDoubleSlab(this, this.blockMaterial, this.blockMapColor);
         slab.setRegistryName(this.getRegistryName().toString() + "_double").setUnlocalizedName(this.getUnlocalizedName());
-        slab.setHardness(this.blockHardness).setResistance(blockResistance);
-        slab.setDefaultSlipperiness(this.slipperiness);
-        slab.setSoundType(this.blockSoundType);
-        slab.setLightLevel(this.lightValue).setLightOpacity(this.lightOpacity);
         String tool = this.getHarvestTool(getDefaultState());
         if (tool != null) slab.setHarvestLevel(tool, this.getHarvestLevel(getDefaultState()));
     }
@@ -59,19 +55,23 @@ public class BlockGenericHalfSlab extends BlockGenericSlab {
 
     @Override
     public void setVariants(Block block, JsonObject variants) {
+        JsonObject emptyObject = new JsonObject();
+        JsonArray emptyArray = new JsonArray();
+        emptyArray.add(new JsonObject());
+
         JsonObject topMal = new JsonObject();
         topMal.addProperty("model", "upper_slab");
 
         JsonObject half = new JsonObject();
-        half.add("bottom", GeneralUtil.EMPTY_OBJECT);
+        half.add("bottom", emptyObject);
         half.add("top", topMal);
 
         variants.add("half", half);
 
         JsonObject variant = new JsonObject();
-        variant.add("normal", GeneralUtil.EMPTY_OBJECT);
+        variant.add("normal", emptyObject);
         variants.add("variant", variant);
 
-        variants.add("inventory", GeneralUtil.EMPTY_ARRAY);
+        variants.add("inventory", emptyArray);
     }
 }

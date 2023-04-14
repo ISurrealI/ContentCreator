@@ -34,14 +34,18 @@ public class BlockGenericPressurePlateWeighted extends BlockPressurePlateWeighte
 
     @Override
     public void setVariants(Block block, JsonObject variants) {
+        JsonObject emptyObject = new JsonObject();
+        JsonArray emptyArray = new JsonArray();
+        emptyArray.add(new JsonObject());
+
         JsonObject powered = new JsonObject();
-        powered.add("false", GeneralUtil.EMPTY_ARRAY);
+        powered.add("false", emptyObject);
 
         JsonObject model = new JsonObject();
         model.addProperty("model", "pressure_plate_down");
         powered.add("true", model);
 
         variants.add("powered", powered);
-        variants.add("inventory", GeneralUtil.EMPTY_ARRAY);
+        variants.add("inventory", emptyArray);
     }
 }
