@@ -9,7 +9,7 @@ buildscript {
 
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "1.3.6-2"
+version = "1.3.7"
 group = "surreal.contentcreator"
 archivesBaseName = "ContentCreator"
 
