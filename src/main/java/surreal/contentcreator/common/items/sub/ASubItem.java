@@ -1,25 +1,28 @@
-package surreal.contentcreator.api.item.sub;
+package surreal.contentcreator.common.items.sub;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.IAttribute;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.EnumRarity;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.IRarity;
 import net.minecraftforge.fml.relauncher.Side;
@@ -27,127 +30,14 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Collections;
 import java.util.List;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 
-public class SubItem {
+import static surreal.contentcreator.helpers.GeneralHelper.*;
 
-    private final Item item;
-    private final int id;
+public class ASubItem {
 
-    private String translationKey;
-    private String highlightTip = null;
-    private String[] information;
-
-    private int maxStackSize = 64;
-    private int maxUseDuration = 0;
-    private int enchantability = 0;
-    private int entityLifespan = 6000;
-
-    private boolean hasEffect = false;
-    private boolean isRepairable = false;
-
-    private float destroySpeed = 1F;
-    private float xpRepairRatio = 2F;
-
-    private ItemStack container = ItemStack.EMPTY;
-    private EnumAction action = EnumAction.NONE;
-    private IRarity rarity = EnumRarity.COMMON;
-    private CreativeTabs creativeTab = CreativeTabs.SEARCH;
-    private Multimap<String, AttributeModifier> modifiers = null;
-    private BiFunction<Entity, ItemStack, Entity> customEntity = null;
-
-    public SubItem(Item item, int id) {
-        this.item = item;
-        this.id = id;
-
-        this.translationKey = item.getTranslationKey() + "_" + id;
-    }
-
-    // Getters
-    public CreativeTabs getCreativeTab() {
-        return creativeTab;
-    }
-
-    // Setters
-    public void setTranslationKey(String translationKey) {
-        this.translationKey = translationKey;
-    }
-
-    public void setMaxStackSize(int maxStackSize) {
-        this.maxStackSize = maxStackSize;
-    }
-
-    public void setDestroySpeed(float destroySpeed) {
-        this.destroySpeed = destroySpeed;
-    }
-
-    public void setContainer(ItemStack container) {
-        this.container = container;
-    }
-
-    public void setAction(EnumAction action) {
-        this.action = action;
-    }
-
-    public void setMaxUseDuration(int maxUseDuration) {
-        this.maxUseDuration = maxUseDuration;
-    }
-
-    public void setInformation(String... information) {
-        this.information = information;
-    }
-
-    public void setEffect() {
-        this.hasEffect = true;
-    }
-
-    public void setRarity(IRarity rarity) {
-        this.rarity = rarity;
-    }
-
-    public void setEnchantability(int enchantability) {
-        this.enchantability = enchantability;
-    }
-
-    public void setCreativeTab(CreativeTabs creativeTab) {
-        this.creativeTab = creativeTab;
-    }
-
-    public void setRepairable(boolean repairable) {
-        isRepairable = repairable;
-    }
-
-    public void setAttributeModifiers(Multimap<String, AttributeModifier> modifiers) {
-        this.modifiers = modifiers;
-    }
-
-    public void addAttributeModifier(IAttribute attribute, double amount) {
-        if (modifiers == null) modifiers = HashMultimap.create();
-        modifiers.put(attribute.getName(), new AttributeModifier("Modifier", amount, 0));
-    }
-
-    public void setHighlightTip(String highlightTip) {
-        this.highlightTip = highlightTip;
-    }
-
-    public void setXpRepairRatio(float xpRepairRatio) {
-        this.xpRepairRatio = xpRepairRatio;
-    }
-
-    public void setEntityLifespan(int entityLifespan) {
-        this.entityLifespan = entityLifespan;
-    }
-
-    public void setCustomEntity(BiFunction<Entity, ItemStack, Entity> customEntity) {
-        this.customEntity = customEntity;
-    }
-
-    // Item Methods
     public int getItemStackLimit(@Nonnull ItemStack stack) {
-        return maxStackSize;
+        return 64;
     }
 
     public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
@@ -155,7 +45,7 @@ public class SubItem {
     }
 
     public float getDestroySpeed(ItemStack stack, IBlockState state) {
-        return destroySpeed;
+        return 1F;
     }
 
     public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn) {
@@ -183,11 +73,11 @@ public class SubItem {
     }
 
     public String getTranslationKey(ItemStack stack) {
-        return translationKey;
+        return "item.unidentified";
     }
 
-    public ItemStack getContainerItem(ItemStack itemStack) {
-        return container;
+    public ItemStack getContainerItem(ItemStack stack) {
+        return ItemStack.EMPTY;
     }
 
     public void onUpdate(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
@@ -197,11 +87,11 @@ public class SubItem {
     }
 
     public EnumAction getItemUseAction(ItemStack stack) {
-        return action;
+        return EnumAction.NONE;
     }
 
     public int getMaxItemUseDuration(ItemStack stack) {
-        return maxUseDuration;
+        return 0;
     }
 
     public void onPlayerStoppedUsing(ItemStack stack, World worldIn, EntityLivingBase entityLiving, int timeLeft) {
@@ -209,28 +99,27 @@ public class SubItem {
 
     @SideOnly(Side.CLIENT)
     public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
-        if (information != null) Collections.addAll(tooltip, this.information);
     }
 
     @SideOnly(Side.CLIENT)
     public boolean hasEffect(ItemStack stack) {
-        return hasEffect || stack.isItemEnchanted();
+        return false;
     }
 
     public IRarity getForgeRarity(ItemStack stack) {
-        return rarity;
+        return EnumRarity.COMMON;
     }
 
     public int getItemEnchantability(ItemStack stack) {
-        return enchantability;
+        return 0;
     }
 
     public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
-        return isRepairable;
+        return false;
     }
 
     public Multimap<String, AttributeModifier> getAttributeModifiers(EntityEquipmentSlot slot, ItemStack stack) {
-        return modifiers == null ? HashMultimap.create() : modifiers;
+        return HashMultimap.create();
     }
 
     public boolean onDroppedByPlayer(ItemStack item, EntityPlayer player) {
@@ -238,7 +127,7 @@ public class SubItem {
     }
 
     public String getHighlightTip(ItemStack item, String displayName) {
-        return highlightTip != null ? highlightTip : displayName;
+        return displayName;
     }
 
     public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
@@ -246,7 +135,7 @@ public class SubItem {
     }
 
     public float getXpRepairRatio(ItemStack stack) {
-        return xpRepairRatio;
+        return 0;
     }
 
     public boolean onBlockStartBreak(ItemStack itemstack, BlockPos pos, EntityPlayer player) {
@@ -261,15 +150,117 @@ public class SubItem {
     }
 
     public int getEntityLifespan(ItemStack itemStack, World world) {
-        return entityLifespan;
+        return 6000;
     }
 
     public boolean hasCustomEntity(ItemStack stack) {
-        return customEntity != null;
+        return false;
     }
 
     @Nullable
     public Entity createEntity(World world, Entity location, ItemStack itemstack) {
-        return hasCustomEntity(itemstack) ? customEntity.apply(location, itemstack) : null;
+        return null;
+    }
+
+    public boolean onEntityItemUpdate(net.minecraft.entity.item.EntityItem entityItem) {
+        return false;
+    }
+
+    public float getSmeltingExperience(ItemStack item) {
+        return -1;
+    }
+
+    public boolean doesSneakBypassUse(ItemStack stack, net.minecraft.world.IBlockAccess world, BlockPos pos, EntityPlayer player) {
+        return false;
+    }
+
+    public void onArmorTick(World world, EntityPlayer player, ItemStack itemStack) {}
+
+    public boolean isValidArmor(ItemStack stack, EntityEquipmentSlot armorType, Entity entity) {
+        return EntityLiving.getSlotForItemStack(stack) == armorType;
+    }
+
+    @Nullable
+    public EntityEquipmentSlot getEquipmentSlot(ItemStack stack) {
+        return null;
+    }
+
+    public boolean isBookEnchantable(ItemStack stack, ItemStack book) {
+        return true;
+    }
+
+    @Nullable
+    public String getArmorTexture(ItemStack stack, Entity entity, EntityEquipmentSlot slot, String type) {
+        return null;
+    }
+
+    @SideOnly(Side.CLIENT)
+    @Nullable
+    public FontRenderer getFontRenderer(ItemStack stack) {
+        return null;
+    }
+
+    @SideOnly(Side.CLIENT)
+    @Nullable
+    public ModelBiped getArmorModel(EntityLivingBase entityLiving, ItemStack stack, EntityEquipmentSlot armorSlot, net.minecraft.client.model.ModelBiped _default) {
+        return null;
+    }
+
+    public boolean onEntitySwing(EntityLivingBase entityLiving, ItemStack stack) {
+        return false;
+    }
+
+    @SideOnly(Side.CLIENT)
+    public void renderHelmetOverlay(ItemStack stack, EntityPlayer player, ScaledResolution resolution, float partialTicks) {
+    }
+
+    public int getDamage(ItemStack stack) {
+        setNBT(stack, 0);
+        return stack.getTagCompound().getInteger(damageKey());
+    }
+
+    public boolean showDurabilityBar(ItemStack stack) {
+        return stack.isItemDamaged();
+    }
+
+    public double getDurabilityForDisplay(ItemStack stack) {
+        return (double)stack.getItemDamage() / (double)stack.getMaxDamage();
+    }
+
+    public int getRGBDurabilityForDisplay(ItemStack stack) {
+        return MathHelper.hsvToRGB(Math.max(0.0F, (float) (1.0F - getDurabilityForDisplay(stack))) / 3.0F, 1.0F, 1.0F);
+    }
+
+    public int getMaxDamage(ItemStack stack) {
+        return 0;
+    }
+
+    public boolean isDamaged(ItemStack stack) {
+        return stack.getItemDamage() > 0;
+    }
+
+    public void setDamage(ItemStack stack, int damage) {
+        if (!setNBT(stack, damage)) {
+            stack.getTagCompound().setInteger(damageKey(), damage);
+        }
+    }
+
+    private boolean setNBT(ItemStack stack, int damage) {
+
+        if (stack.isItemStackDamageable()) {
+            if (stack.hasTagCompound() && !stack.getTagCompound().hasKey(damageKey())) {
+                stack.getTagCompound().setInteger(damageKey(), Math.max(0, damage));
+                return true;
+            } else if (!stack.hasTagCompound()) {
+                NBTTagCompound tag = new NBTTagCompound();
+                tag.setInteger(damageKey(), Math.max(0, damage));
+
+                stack.setTagCompound(tag);
+
+                return true;
+            }
+        }
+
+        return false;
     }
 }

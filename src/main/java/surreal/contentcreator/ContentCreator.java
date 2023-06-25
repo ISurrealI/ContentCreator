@@ -10,7 +10,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLConstructionEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import surreal.contentcreator.crafttweaker.CTHelper;
+import surreal.contentcreator.helpers.CTHelper;
 import surreal.contentcreator.crafttweaker.RegistryManager;
 
 @Mod(modid = ContentCreator.MODID, name = "@MODNAME@", version = "@MODVERSION@", dependencies = "after:crafttweaker")

@@ -1,4 +1,4 @@
-package surreal.contentcreator.api.item;
+package surreal.contentcreator.common.items;
 
 import com.google.common.collect.Multimap;
 import net.minecraft.block.state.IBlockState;
@@ -16,7 +16,7 @@ import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.IRarity;
-import surreal.contentcreator.api.item.sub.SubItem;
+import surreal.contentcreator.common.items.sub.SubItem;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

@@ -1,8 +1,9 @@
-package surreal.contentcreator.crafttweaker;
+package surreal.contentcreator.helpers;
 
 import crafttweaker.CraftTweakerAPI;
 import net.minecraft.util.ResourceLocation;
 import surreal.contentcreator.ContentCreator;
+import surreal.contentcreator.crafttweaker.RegistryManager;
 import surreal.contentcreator.crafttweaker.brackets.BlockMaterialBracket;
 import surreal.contentcreator.crafttweaker.brackets.MapColorBracket;
 import surreal.contentcreator.crafttweaker.brackets.SoundEventBracket;
