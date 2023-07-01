@@ -70,22 +70,36 @@ public class BlockGenericStairs extends BlockStairs implements IGenericBlock {
                                     break;
                                 case WEST:
                                     object.addProperty("y", 90);
+                                    break;
                                 case NORTH:
                                     object.addProperty("y", 180);
+                                    break;
                             }
                         }
                     } else {
                         if (facing != EnumFacing.EAST && !shape.getName().contains("right")) {
                             switch (facing) {
-                                case WEST: object.addProperty("y", 180);
-                                case SOUTH: object.addProperty("y", 90);
-                                case NORTH: object.addProperty("y", 270);
+                                case WEST:
+                                    object.addProperty("y", 180);
+                                    break;
+                                case SOUTH:
+                                    object.addProperty("y", 90);
+                                    break;
+                                case NORTH:
+                                    object.addProperty("y", 270);
+                                    break;
                             }
                         } else if (facing != EnumFacing.NORTH && shape.getName().contains("right")) {
                             switch (facing) {
-                                case EAST: object.addProperty("y", 90);
-                                case WEST: object.addProperty("y", 270);
-                                case SOUTH: object.addProperty("y", 180);
+                                case EAST:
+                                    object.addProperty("y", 90);
+                                    break;
+                                case WEST:
+                                    object.addProperty("y", 270);
+                                    break;
+                                case SOUTH:
+                                    object.addProperty("y", 180);
+                                    break;
                             }
                         }
                     }
