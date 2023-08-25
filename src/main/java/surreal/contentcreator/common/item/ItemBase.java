@@ -601,41 +601,6 @@ public class ItemBase extends Item implements IEdible, IHaloItem {
         return super.isShield(stack, entity);
     }
 
-    // maybe after the clientside crafttweaker addon mod (if i ever make it :weary:)
-    @Nullable
-    @Override
-    public FontRenderer getFontRenderer(@Nonnull ItemStack stack) {
-        return super.getFontRenderer(stack);
-    }
-
-    // ARMOR STUFF (WILL BE HANDLED LATER)
-    @Override
-    public void onArmorTick(@Nonnull World world, @Nonnull EntityPlayer player, @Nonnull ItemStack itemStack) {
-        super.onArmorTick(world, player, itemStack);
-    }
-
-    @Override
-    public boolean isValidArmor(@Nonnull ItemStack stack, @Nonnull EntityEquipmentSlot armorType, @Nonnull Entity entity) {
-        return super.isValidArmor(stack, armorType, entity);
-    }
-
-    @Nullable
-    @Override
-    public String getArmorTexture(@Nonnull ItemStack stack, @Nonnull Entity entity, @Nonnull EntityEquipmentSlot slot, @Nonnull String type) {
-        return super.getArmorTexture(stack, entity, slot, type);
-    }
-
-    @Nullable
-    @Override
-    public ModelBiped getArmorModel(@Nonnull EntityLivingBase entityLiving, @Nonnull ItemStack itemStack, @Nonnull EntityEquipmentSlot armorSlot, @Nonnull ModelBiped _default) {
-        return super.getArmorModel(entityLiving, itemStack, armorSlot, _default);
-    }
-
-    @Override
-    public void renderHelmetOverlay(@Nonnull ItemStack stack, @Nonnull EntityPlayer player, @Nonnull ScaledResolution resolution, float partialTicks) {
-        super.renderHelmetOverlay(stack, player, resolution, partialTicks);
-    }
-
     @Override
     public ResourceLocation getLocation(World world, EntityPlayer player, ItemStack stack) {
         SubItem subItem = get(stack);

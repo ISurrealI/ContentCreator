@@ -21,12 +21,10 @@ import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
@@ -39,7 +37,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import stanhebben.zenscript.annotations.Optional;
@@ -523,46 +520,9 @@ public class BlockBase extends Block {
         return super.getActualState(state, worldIn, pos);
     }
 
-    @SideOnly(Side.CLIENT)
-    @Override
-    public boolean hasCustomBreakingProgress(@Nonnull IBlockState state) {
-        return super.hasCustomBreakingProgress(state);
-    }
-
-    @SideOnly(Side.CLIENT)
-    @Override
-    public boolean shouldSideBeRendered(@Nonnull IBlockState blockState, @Nonnull IBlockAccess blockAccess, @Nonnull BlockPos pos, @Nonnull EnumFacing side) {
-        return super.shouldSideBeRendered(blockState, blockAccess, pos, side);
-    }
-
-    @Override
-    public boolean canCollideCheck(@Nonnull IBlockState state, boolean hitIfLiquid) {
-        return super.canCollideCheck(state, hitIfLiquid);
-    }
-
-    @Override
-    public boolean addLandingEffects(@Nonnull IBlockState state, @Nonnull WorldServer worldObj, @Nonnull BlockPos blockPosition, @Nonnull IBlockState iblockstate, @Nonnull EntityLivingBase entity, int numberOfParticles) {
-        return super.addLandingEffects(state, worldObj, blockPosition, iblockstate, entity, numberOfParticles);
-    }
-
-    @Override
-    public boolean addRunningEffects(@Nonnull IBlockState state, @Nonnull World world, @Nonnull BlockPos pos, @Nonnull Entity entity) {
-        return super.addRunningEffects(state, world, pos, entity);
-    }
-
-    @Override
-    public boolean addHitEffects(@Nonnull IBlockState state, @Nonnull World worldObj, @Nonnull RayTraceResult target, @Nonnull ParticleManager manager) {
-        return super.addHitEffects(state, worldObj, target, manager);
-    }
-
-    @Override
-    public boolean addDestroyEffects(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull ParticleManager manager) {
-        return super.addDestroyEffects(world, pos, manager);
-    }
-
     @Override
     public int getMetaFromState(IBlockState state) {
-        if (state.getPropertyKeys().size() > 0) {
+        if (!state.getPropertyKeys().isEmpty()) {
             PropertyDirection facing = getFacing(state);
             PropertyInteger integer = getInteger(state);
 

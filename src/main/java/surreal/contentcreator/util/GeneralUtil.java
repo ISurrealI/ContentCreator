@@ -37,7 +37,7 @@ import java.util.Collection;
 
 public class GeneralUtil {
 
-    private static Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     public static String toUppercase(CaseFormat from, CaseFormat to, String str) {
         return from.to(to, str);
